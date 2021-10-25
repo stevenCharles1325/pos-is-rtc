@@ -6,12 +6,12 @@ const itemScheme = new Schema({
 	name 	: 	{ type: String, required: true },
 	quantity: 	{ type: Number, required: true },
 	srp 	: 	{ type: Number, required: true },
+	imei	: 	{ type: String, required: true },
 	dateDelivered	: 	{ type: Date, required: true },
-	dateReleased	: 	{ type: Date, required: true },
-	image 	: 	{ type: String }
+	dateReleased	: 	{ type: Date, required: true }
 });
 
 
-const Items = new mongoose.model('Items', itemScheme);
+const Item = new mongoose.model('Items', itemScheme);
 
-module.exports = Items;
+module.exports = Item;

@@ -1,16 +1,24 @@
 import React from 'react';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 
 
 const Signin = props => {
-	const { validator, errorHandler } = props.tools;
+	const { 
+		validator, 
+		errorHandler,
+		setToThisView
+	} = props.tools;
 
-	const [user, setUser] = React.useState({ username: null, password: null });
+	const [user, setUser] = React.useState({ username: '', password: '' });
 	const [signingIn, setSigningIn] = React.useState( false );
 	const [btnMsg, setBtnMsg] = React.useState('sign me in');
+	const [errMsg, setErrMsg] = React.useState( null );
 
 	const setUsername = e => {
 		setUser(user => ({
@@ -27,23 +35,55 @@ const Signin = props => {
 	}
 
 	const signIn = async () => {
-		console.log('Singing in');
+		axios.post('http://localhost:3500/sign-in', user)
+		.then( res => {
+			const { accessToken, refreshToken } = res.data;
 
-		// Do sign-in request here
-
-		setSigningIn( false );
-		setBtnMsg('sign me in')
+			Cookies.set('token', accessToken);
+			Cookies.set('rtoken', refreshToken);
+		
+			setToThisView('/dashboard');
+		})
+		.catch( err => {
+			if( err?.response?.status === 403 ){
+				setErrMsg( err?.response?.data?.message );
+			}
+			else{
+				errorHandler.handle( err, signIn, 2 );
+			}
+			
+			setSigningIn( false );
+			setBtnMsg('sign me in');
+		});
 	}
 
 	React.useEffect(() => {
-		if( signingIn && user.username && user.password ){
+		if( signingIn && user.username.length && user.password.length ){
 			setBtnMsg('loading');
 			signIn();
 		}
+		else if( signingIn && (!user.username.length || !user.password) ){
+			setErrMsg('Either username or password is empty!');
+			setSigningIn( false );
+		}
+
 	}, [user, signingIn]);
+
+	React.useEffect(() => {
+		if( errMsg ){ 
+			setTimeout(() => setErrMsg( null ), 2000);
+		}
+	}, [errMsg]);
 
 	return(
 		<div className="sign-in d-flex flex-column justify-content-center align-items-center">
+			{
+				errMsg 
+					? <Alert variant="outlined" severity="error">
+						{ errMsg }
+					</Alert> 
+					: null
+			}
 			<div className="d-flex justify-content-center">
 				<Typography 
 					variant="h3" 
@@ -75,7 +115,7 @@ const Signin = props => {
 					> 
 						{ btnMsg } 
 					</Button>
-					<Button sx={{ color: 'white' }} href="/auth/sign-up">Sign-up?</Button>
+					<Button sx={{ color: 'white' }} href="/sign-up">Sign-up?</Button>
 				</div>
 			</div>			
 		</div>

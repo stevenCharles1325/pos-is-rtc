@@ -10,13 +10,13 @@ var http = require('http');
 var mongoose = require('mongoose');
 
 
-const dbURI = 'mongodb://localhost:27017/inventory';
+const dbURI = 'mongodb://localhost:27017/storage';
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '3500');
 app.set('port', port);
 
 /**
@@ -28,7 +28,7 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-mongoose.connect( dbURI, { useUnifiedTopology: true, useNewUrlParse: true })
+mongoose.connect( dbURI, { useUnifiedTopology: true, useNewUrlParser: true })
 .then( res => {
   console.log(`Datbase: ${ res.connections[0].PORT }`);
 

@@ -33,10 +33,10 @@ export default class Validator{
 				this.setMessage(`Length must be > ${ this.passMinLength }`);
 			}
 			else if( pass.countUpperCase() < 1 ){
-				this.setMessage(`Uppercase letters must be greater than 1`);
+				this.setMessage(`uppercase letters must be greater than 1`);
 			}
 			else if( pass.countSpecialChar() < 1 ){
-				this.setMessage(`Special characters must be greater than 1`);
+				this.setMessage(`special characters must be greater than 1`);
 			}
 		}
 	}
@@ -48,13 +48,13 @@ export default class Validator{
 			// level 3 - check if it has special character, at least 3
 
 			if( pass.length < this.passMinLength ){
-				this.setMessage(`Length must be > ${ this.passMinLength }`);
+				this.setMessage(`length must be > ${ this.passMinLength }`);
 			}
 			else if( pass.countUpperCase() < 3 ){
-				this.setMessage(`Uppercase letters must be greater than 3`);
+				this.setMessage(`uppercase letters must be greater than 3`);
 			}
 			else if( pass.countSpecialChar() < 3 ){
-				this.setMessage(`Special characters must be greater than 3`);
+				this.setMessage(`special characters must be greater than 3`);
 			}
 		}
 	}
@@ -66,13 +66,13 @@ export default class Validator{
 			// level 3 - check if it has special character, at least 5
 
 			if( pass.length < this.passMinLength ){
-				this.setMessage(`Length must be > ${ this.passMinLength }`);
+				this.setMessage(`length must be > ${ this.passMinLength }`);
 			}
 			else if( pass.countUpperCase() < 5 ){
-				this.setMessage(`Uppercase letters must be greater than 5`);
+				this.setMessage(`uppercase letters must be greater than 5`);
 			}
 			else if( pass.countSpecialChar() < 5 ){
-				this.setMessage(`Special characters must be greater than 5`);
+				this.setMessage(`special characters must be greater than 5`);
 			}
 		}
 	}
@@ -99,7 +99,7 @@ export default class Validator{
 		switch( type ){
 			case 'username':
 				if( input.length < this.unameMinLength ){
-					this.setMessage(`Length must be greater than ${ this.unameMinLength }`);
+					this.setMessage(`length must be greater than ${ this.unameMinLength }`);
 				}
 				break;
 
@@ -109,7 +109,7 @@ export default class Validator{
 
 			case 'email':
 				if( !input.length ){
-					this.setMessage('Invalid E-mail address');
+					this.setMessage('invalid E-mail address');
 				}
 				else{
 					let finderCount = 0;
@@ -121,7 +121,7 @@ export default class Validator{
 					});
 
 					if( !finderCount ){
-						this.setMessage('Invalid E-mail address');
+						this.setMessage('invalid E-mail address');
 					}
 				}
 				break;
