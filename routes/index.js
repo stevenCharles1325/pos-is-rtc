@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+var fs = require('fs');
+var path = require('path');
+var json2xls = require('json2xls');
 var jwt = require('jsonwebtoken');
 var express = require('express');
 var router = express.Router();
@@ -72,7 +75,7 @@ router.post('/sign-up', async (req, res, next) => {
   User.findOne({ username: username }, (err, doc) => {
     if( err ) return res.sendStatus( 500 );
 
-    if( doc && doc.length ) return res.status( 403 ).json({ message: 'Username is already used' });
+    if( doc ) return res.status( 403 ).json({ message: 'Username is already used' });
 
     const user = { name: username };
     const accessToken = requestAccessToken( user );
@@ -205,6 +208,7 @@ router.put('/update-shop-item', authentication, async ( req, res ) => {
     name, 
     quantity,
     srp,
+    imei,
     dateDelivered,
     dateReleased
   } = req.body;
@@ -251,5 +255,73 @@ router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
     });
   });
 });
+
+
+
+
+
+// =========== Exporting database's data into excel spreedsheet ===========
+router.get('/export-record', async (req, res, next) => {
+  const path_to_xls = path.join(__dirname, '../client/public/xls');
+
+  const currentDate = new Date();
+  const renderDate = date => {
+    if( !date ) return '';
+
+    if( !(date instanceof Date) ){
+      date = new Date( date );
+    }
+
+    const _parsedDate = new Date( date );
+    const _date = _parsedDate.getDate();
+    const _month = _parsedDate.getMonth() + 1;
+    const _year = _parsedDate.getFullYear();
+
+    return `${_year}-${_month}-${_date}`;
+  }
+
+  const fileName = `record_${ renderDate( currentDate ) }.xlsx`;
+
+  console.log( fileName );
+  fs.readdir( path_to_xls, (err, files) => {
+    if( err ) return res.sendStatus( 503 );
+
+     
+    if( files.length ){
+      files.forEach(file => {
+        fs.unlink(path.join(path_to_xls, file), (err) => {
+          if (err) return res.status( 503 ).json({ message: 'Server error' });
+        });  
+      });
+    }
+
+    Item.find({}, (err, doc) => {
+      if( err ) return res.status( 503 ).json({ message: err });
+
+      const json = doc.map( elem => ({
+        name: elem.name,
+        quantity: elem.quantity,
+        srp: elem.srp,
+        imei: elem.imei, // IMEI
+        dateDelivered: renderDate( elem.dateDelivered ),
+        dateReleased: renderDate( elem.dateReleased )
+      }));
+
+      const xls = json2xls(json);
+
+      fs.writeFile(path_to_xls + `/${fileName}`, xls, 'binary', ( err ) => {
+        if( err ) return res.status( 404 ).json({ message: err });
+
+        return res.status( 200 ).json({ 
+          message: 'Downloading the file...', 
+          path: `/xls/${fileName}` ,
+          name: fileName
+        });     
+      });
+    });
+  });
+});
+
+
 
 module.exports = router;

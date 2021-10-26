@@ -86,7 +86,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const actions = [
 	{ icon: <AddIcon/>, name: 'Add an item' },
-	{ icon: <ArrowCircleDownIcon/>, name: 'Download as pdf'}
+	{ icon: <ArrowCircleDownIcon/>, name: 'Download as spreadsheet'}
 ];
 
 const Item = props => {
@@ -379,12 +379,34 @@ const Inventory = props => {
 			enqueueSnackbar(`Successfully sold 1 ${ name }`);
 		})
 		.catch( err => {
-			errorHandler.handle( err, buyItem, 6, null, [id, name] );
+			errorHandler.handle( err, buyItem, 7, null, [id, name] );
 		});	
 	}
 
 	const handleSearch = e => {
 		setSearch( e.target.value );
+	}
+
+	const handleExport = async () => {
+		const token = Cookies.get('token');
+
+		axios.get('http://localhost:3500/export-record', {
+			headers: {
+				'authentication': `Bearer ${ token }`
+			}
+		})
+		.then( res => {
+	  	const link = document.createElement('a');
+			
+			link.href = res.data.path;
+			link.setAttribute('download', res.data.name );
+			
+			document.body.appendChild(link);
+			link.click();
+		})
+		.catch( err => {
+			errorHandler.handle( err, handleExport, 8 );
+		});
 	}
 
 	React.useEffect(() => {
@@ -479,12 +501,12 @@ const Inventory = props => {
 		        icon={<SpeedDialIcon />}
 		     >
 		        {
-		        	actions.map((action) => (
+		        	actions.map((action, index) => (
 			          <SpeedDialAction
 			            key={action.name}
 			            icon={action.icon}
 			            tooltipTitle={action.name}
-			            onClick={handleAddBox}
+			            onClick={[handleAddBox, handleExport][ index ]}
 			          />
 			        ))
 			    }

@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
-
+var json2xls = require('json2xls');
 var indexRouter = require('./routes/index');
 
 var app = express();
@@ -15,9 +15,9 @@ app.set('view engine', 'jade');
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
+app.use(json2xls.middleware);
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-
+app.use(cookieParser())
 
 app.use('/', indexRouter);
 
