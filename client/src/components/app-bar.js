@@ -90,7 +90,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 const Appbar = props => {
-	const { name, setToThisView } = props.tools;
+	const { 
+		name, 
+		search,
+		setSearch, 
+		setToThisView
+	} = props.tools;
+	
 	const [anchorEl, setAnchorEl] = React.useState( null );
 	const open = Boolean( anchorEl );
 
@@ -132,6 +138,11 @@ const Appbar = props => {
 	const resize = () => {
 		setWindowWidth( window.innerWidth );
 	}
+
+	const handleSearch = e => {
+		setSearch( e.target.value );
+	}
+
 
 	React.useEffect(() => {
 		window.addEventListener('resize', resize);
@@ -193,6 +204,8 @@ const Appbar = props => {
 				            <SearchIcon />
 				          </SearchIconWrapper>
 				          <StyledInputBase
+					          value={search} 
+					          onChange={handleSearch}
 				            placeholder="Search item"
 				            inputProps={{ 'aria-label': 'search' }}
 				          />

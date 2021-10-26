@@ -2,6 +2,7 @@ import React from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
+import debounce from 'lodash.debounce';
 import Cookies from 'js-cookie';
 import uniqid from 'uniqid';
 import axios from 'axios';
@@ -237,7 +238,7 @@ const Item = props => {
 }
 
 const Inventory = props => {
-	const { errorHandler } = props.tools;
+	const { errorHandler, search, setSearch } = props.tools;
 	const { enqueueSnackbar } = useSnackbar();
 
 	const [windowWidth, setWindowWidth] = React.useState( window.innerWidth );
@@ -247,6 +248,7 @@ const Inventory = props => {
 	const [items, setItems] = React.useState( [] );
 	const [message, setMessage] = React.useState( null );
 	const [renderedItems, setRenderedItems] = React.useState( [] );
+	const [filteredItems, setFilteredItems] = React.useState( null );
 	const [selectedItem, setSelectedItem] = React.useState( null );
 
 	const theme = useTheme();
@@ -314,8 +316,6 @@ const Inventory = props => {
 	}
 
 	const updateItem = async item => {
-		console.log( item );
-
 		if( !item || !item.name.length ||
 			!item.quantity ||
 			!item.srp ||
@@ -383,6 +383,10 @@ const Inventory = props => {
 		});	
 	}
 
+	const handleSearch = e => {
+		setSearch( e.target.value );
+	}
+
 	React.useEffect(() => {
 		window.addEventListener('resize', resize);
 
@@ -391,31 +395,36 @@ const Inventory = props => {
 
 	React.useEffect(() => getItems(), []);
 
-	React.useEffect(() => {
-		// render items into Item function component
-		if( items.length ){
-			let rendItems = [];
-			items.forEach( item => {
-				rendItems.push((
-					<Item 
-						{...item}
-						buy={buyItem}
-						key={uniqid()}
-						update={getItems}
-						handleUpdate={ updateItem }
-						handleDelete={ deleteItem }
-						handleEditBox={ handleEditBox }
-						setSelectedItem={setSelectedItem}
-					/>
-				));
-			});
+	const handleSearching = async () => {
+		let filtered = [];
 
-			setRenderedItems([ ...rendItems ]);
+		const addToFilteredItems = item => {
+			filtered.push((
+				<Item 
+					{...item}
+					buy={buyItem}
+					key={uniqid()}
+					update={getItems}
+					handleUpdate={ updateItem }
+					handleDelete={ deleteItem }
+					handleEditBox={ handleEditBox }
+					setSelectedItem={ setSelectedItem }
+				/>
+			));
 		}
-		else{
-			setRenderedItems([]);
-		}
-	}, [items]);
+
+		items.forEach( item => {
+			if(item.name.includes( search )){
+				addToFilteredItems( item );
+			}
+		});	
+
+		setRenderedItems([ ...filtered ]);
+	}
+
+	const memoizedFiltering = React.useCallback(debounce( handleSearching, 2000 ), [search, items]);
+
+	React.useEffect(() => memoizedFiltering(), [search, items]);
 
 	return(
 		<div 
@@ -438,14 +447,16 @@ const Inventory = props => {
 							className="py-4"
 						>
 							<Search>
-					            <SearchIconWrapper>
-					              <SearchIcon />
-					            </SearchIconWrapper>
-					            <StyledInputBase
-					              placeholder="Search item"
-					              inputProps={{ 'aria-label': 'search' }}
-					            />
-					        </Search>
+		            <SearchIconWrapper>
+		              <SearchIcon />
+		            </SearchIconWrapper>
+		            <StyledInputBase
+			            value={search} 
+			            onChange={handleSearch}
+		              placeholder="Search item"
+		              inputProps={{ 'aria-label': 'search' }}
+		            />
+			        </Search>
 						</div>
 					)
 					: null

@@ -36,6 +36,7 @@ function App() {
   const [name, setName] = React.useState( null );
   const [view, setView] = React.useState( null );
   const [allow, setAllow] = React.useState( null );
+  const [search, setSearch] = React.useState( '' );
 
   const setToThisView = ( viewPath ) => {
     setView(() => <Redirect to={viewPath} />);
@@ -44,7 +45,9 @@ function App() {
 
   const tools = { 
     name,
+    search,
     setName,
+    setSearch,
     validator, 
     errorHandler, 
     setToThisView, 
