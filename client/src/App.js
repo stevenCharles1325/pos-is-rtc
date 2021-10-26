@@ -10,6 +10,9 @@ import './styles/App.css';
 import Validator from './modules/validator';
 import ErrorHandler from './modules/error-handler';
 import PageNotFound from './views/pagenotfound';
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 
 const Dashboard = React.lazy(() => import('./views/dashboard'));
 const Inventory = React.lazy(() => import('./views/inventory'));
@@ -171,7 +174,14 @@ function App() {
   );
 }
 
-const Loading = () => <h1> LOADING </h1>
+const Loading = () => (
+  <div 
+    style={{ width: '100vw', height: '100vh' }} 
+    className="d-flex flex-row justify-content-center align-items-center"
+  >
+    <CircularProgress/>
+  </div>
+);
 
 function Path( pathname ){
   if( !pathname ) 

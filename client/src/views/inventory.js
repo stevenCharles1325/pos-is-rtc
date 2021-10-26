@@ -102,10 +102,6 @@ const Item = props => {
 	const [count, setCount] = React.useState( props.quantity );
 	const [elevated, setElevated] = React.useState( false );
 
-	const handleElevation = () => {
-		setElevated( elevated => !elevated );
-	}
-
 	const handleBuy = () => {
 		setCount( count => count-=1 );
 		buy([props._id, props.name])
@@ -120,13 +116,11 @@ const Item = props => {
 	return(
 		<div 
 			style={{
-				width: '250px',
-				height: '300px',
-				display: 'inline-block'
+				height: '300px'
 			}}
-			className="m-2"
-			onPointerEnter={handleElevation}
-			onPointerLeave={handleElevation}
+			className="col-md-3"
+			onPointerEnter={() => setElevated( true )}
+			onPointerLeave={() => setElevated( false )}
 		>	
 			<Paper sx={{width: '100%', height: '80%'}} elevation={!elevated ? 5 : 15}>
 				<Paper 
@@ -171,6 +165,7 @@ const Item = props => {
 									});
 
 									handleEditBox();
+									setElevated( false );
 								}} 
 								color="inherit"
 							>
@@ -209,7 +204,8 @@ const Item = props => {
 						height: '80%',
 						display: 'flex',
 						alignItems: 'center',
-						justifyContent: 'center'
+						justifyContent: 'center',
+						padding: '0 5% 0 5%'
 					}}
 				>
 					<Stack
@@ -286,14 +282,6 @@ const Inventory = props => {
 	}
 
 	const addItem = async item => {
-		if( !item || !item.name.length ||
-			!item.quantity ||
-			!item.srp ||
-			!item.imei ||
-			!item.dateDelivered ||
-			!item.dateReleased
-			) return enqueueSnackbar('All fields are required', { variant: 'error' });
-
 		enqueueSnackbar('Please wait...');
 
 		const token = Cookies.get('token');
@@ -316,14 +304,6 @@ const Inventory = props => {
 	}
 
 	const updateItem = async item => {
-		if( !item || !item.name.length ||
-			!item.quantity ||
-			!item.srp ||
-			!item.imei ||
-			!item.dateDelivered ||
-			!item.dateReleased
-			) return enqueueSnackbar('All fields are required', { variant: 'error' });
-
 		enqueueSnackbar(`Updating ${item.name}!`);
 
 		const token = Cookies.get('token');
@@ -376,7 +356,7 @@ const Inventory = props => {
 			}
 		})
 		.then( res => {
-			enqueueSnackbar(`Successfully sold 1 ${ name }`);
+			enqueueSnackbar(`Successfully sold 1 ${ name }`, { variant: 'success' });
 		})
 		.catch( err => {
 			errorHandler.handle( err, buyItem, 7, null, [id, name] );
@@ -400,6 +380,8 @@ const Inventory = props => {
 			
 			link.href = res.data.path;
 			link.setAttribute('download', res.data.name );
+
+			enqueueSnackbar( res.data.message, { variant: 'success' });
 			
 			document.body.appendChild(link);
 			link.click();
@@ -444,7 +426,7 @@ const Inventory = props => {
 		setRenderedItems([ ...filtered ]);
 	}
 
-	const memoizedFiltering = React.useCallback(debounce( handleSearching, 2000 ), [search, items]);
+	const memoizedFiltering = React.useCallback(debounce( handleSearching, 500 ), [search, items]);
 
 	React.useEffect(() => memoizedFiltering(), [search, items]);
 
@@ -491,6 +473,7 @@ const Inventory = props => {
 					overflowX: 'hidden',
 					padding: '3% 10% 0 10%'
 				}}
+				className="row d-flex justify-content-around align-items-center"
 			>
 				{/*ITEM AREA*/}
 				{ renderedItems }
@@ -535,6 +518,8 @@ const AddItemBox = props => {
 		openAddBox,
 		handleAddBox
 	} = props;
+
+	const { enqueueSnackbar } = useSnackbar();
 
 	const [item, setItem] = React.useState({
 		name: '',
@@ -645,6 +630,14 @@ const AddItemBox = props => {
 	          </Button>
 	          <Button 
 	          	onClick={() => {
+	          		if( !item || !item.name.length ||
+									!item.quantity ||
+									!item.srp ||
+									!item.imei ||
+									!item.dateDelivered ||
+									!item.dateReleased
+									) return enqueueSnackbar('All fields are required', { variant: 'error' });
+
 	          		handleAddBox();
 	          		addItem( item );
 	          	}} 
@@ -666,6 +659,8 @@ const EditItemBox = props => {
 		selectedItem,
 		handleEditBox
 	} = props;
+
+	const { enqueueSnackbar } = useSnackbar();
 
 	const [item, setItem] = React.useState({
 		_id: '',
@@ -837,6 +832,14 @@ const EditItemBox = props => {
 	          </Button>
 	          <Button 
 	          	onClick={() => {
+	          		if( !item || !item.name.length ||
+									!item.quantity ||
+									!item.srp ||
+									!item.imei ||
+									!item.dateDelivered ||
+									!item.dateReleased
+									) return enqueueSnackbar('All fields are required', { variant: 'error' });
+	          		
 	          		handleEditBox();
 	          		editItem( item );
 	          	}} 

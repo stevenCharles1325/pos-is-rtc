@@ -10,6 +10,7 @@ var router = express.Router();
 var User = require('../models/users');
 var Item = require('../models/items');
 var Token = require('../models/tokens');
+var MonIncome = require('../models/monthlyIncome');
 
 
 const requestAccessToken = ( user ) => {
@@ -241,6 +242,10 @@ router.delete('/delete-shop-item/:id', authentication, async ( req, res ) => {
 router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
   const { id } = req.params;
 
+  const date = new Date();
+  const month = date.toString().split(' ')[ 1 ];
+  const year = date.toString().split(' ')[ 3 ];
+
   Item.findById( id, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
@@ -251,12 +256,25 @@ router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
     doc.save( err => {
       if( err ) return res.sendStatus( 503 );
 
-      return res.sendStatus( 200 );
+      MonIncome.findOne({ year: year }, ( err, doc ) => {
+        if( err ) return res.sendStatus( 503 );
+
+        if( doc ){
+          doc[ month.toLowerCase() ] += 1;
+
+          doc.save( err => {
+            if( err ) return res.sendStatus( 503 );
+
+            return res.sendStatus( 200 );
+          });
+        }
+        else{
+          res.end();
+        }
+      });
     });
   });
 });
-
-
 
 
 
@@ -282,7 +300,6 @@ router.get('/export-record', async (req, res, next) => {
 
   const fileName = `record_${ renderDate( currentDate ) }.xlsx`;
 
-  console.log( fileName );
   fs.readdir( path_to_xls, (err, files) => {
     if( err ) return res.sendStatus( 503 );
 
@@ -319,6 +336,29 @@ router.get('/export-record', async (req, res, next) => {
         });     
       });
     });
+  });
+});
+
+
+
+// ================ Monthly sales report ==================
+router.get('/monthly-income-report', authentication, async( req, res, next ) => { 
+  const date = new Date();
+  const year = date.getFullYear();
+
+  MonIncome.findOne({ year: year }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ){
+        return res.json( doc );
+    }
+    else{
+      MonIncome.create({ year: year }, (err, doc) => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.json( doc );
+      });
+    }
   });
 });
 
