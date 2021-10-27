@@ -118,7 +118,7 @@ const Item = props => {
 			style={{
 				height: '300px'
 			}}
-			className="col-md-3"
+			className="item col-md-3"
 			onPointerEnter={() => setElevated( true )}
 			onPointerLeave={() => setElevated( false )}
 		>	
