@@ -7,6 +7,14 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 
+import Input from '@mui/material/Input';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+
 
 const Signup = props => {
 	const { 
@@ -19,7 +27,9 @@ const Signup = props => {
 		username: '', 
 		password: '',
 		confPass: '',
-		masterPass: ''
+		masterPass: '',
+		showPassword: false,
+		showMasterPassword: false
 	});
 	const [signingUp, setSigningUp] = React.useState( false );
 	const [btnMsg, setBtnMsg] = React.useState('sign me up');
@@ -30,7 +40,9 @@ const Signup = props => {
 			username: e.target.value,
 			password: user.password,
 			confPass: user.confPass,
-			masterPass: user.masterPass
+			masterPass: user.masterPass,
+			showPassword: user.showPassword,
+			showMasterPassword: user.showMasterPassword
 		}));
 	}
 
@@ -39,7 +51,9 @@ const Signup = props => {
 			username: user.username,
 			password: e.target.value,
 			confPass: user.confPass,
-			masterPass: user.masterPass
+			masterPass: user.masterPass,
+			showPassword: user.showPassword,
+			showMasterPassword: user.showMasterPassword
 		}));
 	}
 	
@@ -48,7 +62,9 @@ const Signup = props => {
 			username: user.username,
 			password: user.password,
 			confPass: e.target.value,
-			masterPass: user.masterPass
+			masterPass: user.masterPass,
+			showPassword: user.showPassword,
+			showMasterPassword: user.showMasterPassword
 		}));
 	}
 
@@ -57,9 +73,29 @@ const Signup = props => {
 			username: user.username,
 			password: user.password,
 			confPass: user.confPass,
-			masterPass: e.target.value
+			masterPass: e.target.value,
+			showPassword: user.showPassword,
+			showMasterPassword: user.showMasterPassword
 		}));
 	}
+
+	const handleClickShowPassword = () => {
+		setUser({
+		  ...user,
+		  showPassword: !user.showPassword,
+		});
+	};
+
+	const handleMouseDownPassword = event => {
+		event.preventDefault();
+	};
+
+	const handleClickShowMasterPassword = () => {
+		setUser({
+		  ...user,
+		  showMasterPassword: !user.showMasterPassword,
+		});
+	};
 
 	const signUp = async () => {
 
@@ -150,10 +186,26 @@ const Signup = props => {
 				}} 
 				className="d-flex flex-column justify-content-between align-items-center"
 			>
-				<TextField onChange={setUsername} id="sign-in-uname" label="username" variant="standard" />
-				<TextField onChange={setPassword} id="sign-in-pass" label="password" type="password" variant="standard" />
-				<TextField onChange={setConfPassword} id="sign-in-confpass" label="confirm-password" type="password" variant="standard" />
-				<TextField onChange={setMasterPassword} id="sign-in-mpass" label="master-password" type="password" variant="standard" />
+				<TextField sx={{width: '25ch'}} onChange={setUsername} id="sign-in-uname" label="username" variant="standard" />
+				<PasswordInput
+					id="sign-in-pass"
+					label="Password"
+					show={ user.showPassword }
+					value={ user.password }
+					onChange={ setPassword }
+					onClick={ handleClickShowPassword }
+					onMouseDown={ handleMouseDownPassword }
+				/>
+				<TextField sx={{width: '25ch'}} onChange={setConfPassword} id="sign-in-confpass" label="confirm-password" type="password" variant="standard" />
+				<PasswordInput
+					id="sign-in-mpass"
+					label="Master password"
+					show={ user.showMasterPassword }
+					value={ user.masterPassword }
+					onChange={ setMasterPassword }
+					onClick={ handleClickShowMasterPassword }
+					onMouseDown={ handleMouseDownPassword }
+				/>
 				<br/>
 				<br/>
 				<div className="d-flex flex-row justify-content-between align-items-center"> 
@@ -171,5 +223,31 @@ const Signup = props => {
 		</div>
 	);
 }
+
+
+const PasswordInput = props => (
+	<FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
+		<InputLabel htmlFor={ props.id }> { props.label } </InputLabel>
+		<Input 
+			id={ props.id } 
+			variant="standard" 
+			type={ props.show ? "text" : "password" }
+			value={ props.value } 
+			onChange={ props.onChange } 
+			endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={ props.onClick }
+                  onMouseDown={ props.onMouseDown }
+                  edge="end"
+                >
+                  { props.show ? <VisibilityOff /> : <Visibility /> }
+                </IconButton>
+              </InputAdornment>
+            }
+		/>
+	</FormControl>
+)
 
 export default Signup;

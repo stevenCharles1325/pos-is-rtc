@@ -476,7 +476,37 @@ const Inventory = props => {
 				className="row d-flex justify-content-around align-items-center"
 			>
 				{/*ITEM AREA*/}
-				{ renderedItems }
+				{ 
+					renderedItems.length 
+						? renderedItems 
+						: search.length 
+							? (
+									<div style={{ width: '100%' }} className="text-center">
+										<Typography 
+											sx={{
+												color: 'rgba(0, 0, 0, 0.4)'
+											}} 
+											gutterBottom
+											variant="h1" 
+										>
+						        	No result  
+						        </Typography>
+									</div>
+								)
+							: (
+									<div style={{ width: '100%' }} className="text-center">
+										<Typography 
+											sx={{
+												color: 'rgba(0, 0, 0, 0.4)'
+											}} 
+											gutterBottom 
+											variant="h1"
+										>
+						          No items
+						        </Typography>
+									</div>
+								)
+				}
 			</div>
 			<SpeedDial
 		        ariaLabel="speed dial"

@@ -7,6 +7,13 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 
+import Input from '@mui/material/Input';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 const Signin = props => {
 	const { 
@@ -15,7 +22,7 @@ const Signin = props => {
 		setToThisView
 	} = props.tools;
 
-	const [user, setUser] = React.useState({ username: '', password: '' });
+	const [user, setUser] = React.useState({ username: '', password: '', showPassword: false });
 	const [signingIn, setSigningIn] = React.useState( false );
 	const [btnMsg, setBtnMsg] = React.useState('sign me in');
 	const [errMsg, setErrMsg] = React.useState( null );
@@ -23,16 +30,29 @@ const Signin = props => {
 	const setUsername = e => {
 		setUser(user => ({
 			username: e.target.value,
-			password: user.password
+			password: user.password,
+			showPassword: user.showPassword
 		}));
 	}
 
 	const setPassword = e => {
 		setUser(user => ({
 			username: user.username,
-			password: e.target.value
+			password: e.target.value,
+			showPassword: user.showPassword
 		}));
 	}
+
+	const handleClickShowPassword = () => {
+		setUser({
+		  ...user,
+		  showPassword: !user.showPassword,
+		});
+	};
+
+	const handleMouseDownPassword = event => {
+		event.preventDefault();
+	};
 
 	const signIn = async () => {
 		axios.post('http://localhost:3500/sign-in', user)
@@ -99,13 +119,34 @@ const Signin = props => {
 			<br/>
 			<div 
 				style={{
-					width: '90%',
+					width: '100%',
 					height: '30%'
 				}} 
 				className="d-flex flex-column justify-content-around align-items-center"
 			>
-				<TextField onChange={setUsername} id="sign-in-uname" label="username" variant="standard" />
-				<TextField onChange={setPassword} id="sign-in-pass" label="password" type="password" variant="standard" />
+				<TextField sx={{width: '25ch'}} onChange={setUsername} id="sign-in-uname" label="username" variant="standard" />
+				<FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
+					<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
+					<Input 
+						id="sign-in-pass" 
+						variant="standard" 
+						type={ user.showPassword ? "text" : "password" }
+						value={ user.password } 
+						onChange={setPassword} 
+						endAdornment={
+			              <InputAdornment position="end">
+			                <IconButton
+			                  aria-label="toggle password visibility"
+			                  onClick={handleClickShowPassword}
+			                  onMouseDown={handleMouseDownPassword}
+			                  edge="end"
+			                >
+			                  { user.showPassword ? <VisibilityOff /> : <Visibility /> }
+			                </IconButton>
+			              </InputAdornment>
+			            }
+					/>
+				</FormControl>
 				<div className="d-flex flex-row justify-content-between align-items-center"> 
 					<Button 
 						onClick={() => setSigningIn( true )} 
