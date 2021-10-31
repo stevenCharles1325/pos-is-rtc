@@ -209,7 +209,6 @@ router.put('/update-shop-item', authentication, async ( req, res ) => {
     name, 
     quantity,
     srp,
-    imei,
     dateDelivered,
     dateReleased
   } = req.body;
@@ -319,7 +318,6 @@ router.get('/export-record', async (req, res, next) => {
         name: elem.name,
         quantity: elem.quantity,
         srp: elem.srp,
-        imei: elem.imei, // IMEI
         dateDelivered: renderDate( elem.dateDelivered ),
         dateReleased: renderDate( elem.dateReleased )
       }));

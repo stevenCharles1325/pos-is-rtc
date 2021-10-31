@@ -555,7 +555,6 @@ const AddItemBox = props => {
 		name: '',
 		quantity: 0,
 		srp: 0,
-		imei: '',
 		dateDelivered: '',
 		dateReleased: ''
 	});
@@ -565,7 +564,6 @@ const AddItemBox = props => {
 			name: e.target.value,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -576,7 +574,6 @@ const AddItemBox = props => {
 			name: item.name,
 			quantity: e.target.value,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -587,7 +584,6 @@ const AddItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: e.target.value,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -599,7 +595,6 @@ const AddItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: e.target.value,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -610,7 +605,6 @@ const AddItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: e.target.value,
 			dateReleased: item.dateReleased	
 		}));
@@ -621,7 +615,6 @@ const AddItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: e.target.value
 		}));
@@ -648,7 +641,6 @@ const AddItemBox = props => {
 		          <TextField onChange={handleName} autoFocus variant="filled" label="Item name"/>
 		          <TextField onChange={handleCount} variant="filled" type="number" label="Item quantity"/>
 		          <TextField onChange={handleSrp} variant="filled" type="number" label="Item price"/>
-		          <TextField onChange={handleImei} variant="filled" label="Item IMEI"/>
 		          <TextField onChange={handleDateDelivered} variant="standard" type='date' helperText="Date delivered"/>
 		          <TextField onChange={handleDateReleased} variant="standard" type='date' helperText="Date released"/>
 		      </Stack>
@@ -663,7 +655,6 @@ const AddItemBox = props => {
 	          		if( !item || !item.name.length ||
 									!item.quantity ||
 									!item.srp ||
-									!item.imei ||
 									!item.dateDelivered ||
 									!item.dateReleased
 									) return enqueueSnackbar('All fields are required', { variant: 'error' });
@@ -697,7 +688,6 @@ const EditItemBox = props => {
 		name: '',
 		quantity: '',
 		srp: '',
-		imei: '',
 		dateDelivered: '',
 		dateReleased: '' 
 	});
@@ -709,7 +699,6 @@ const EditItemBox = props => {
 				name: selectedItem?.name,
 				quantity: selectedItem?.quantity,
 				srp: selectedItem?.srp,
-				imei: selectedItem?.imei,
 				dateDelivered: selectedItem?.dateDelivered,
 				dateReleased: selectedItem?.dateReleased
 			});
@@ -722,7 +711,6 @@ const EditItemBox = props => {
 			name: e.target.value,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -734,7 +722,6 @@ const EditItemBox = props => {
 			name: item.name,
 			quantity: e.target.value,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -746,7 +733,6 @@ const EditItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: e.target.value,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -759,7 +745,6 @@ const EditItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: e.target.value,
 			dateDelivered: item.dateDelivered,
 			dateReleased: item.dateReleased	
 		}));
@@ -771,7 +756,6 @@ const EditItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: e.target.value,
 			dateReleased: item.dateReleased	
 		}));
@@ -783,7 +767,6 @@ const EditItemBox = props => {
 			name: item.name,
 			quantity: item.quantity,
 			srp: item.srp,
-			imei: item.imei,
 			dateDelivered: item.dateDelivered,
 			dateReleased: e.target.value
 		}));
@@ -832,13 +815,6 @@ const EditItemBox = props => {
 		          />
 		          
 		          <TextField 
-		          	onChange={handleImei} 
-		          	defaultValue={selectedItem?.imei} 
-		          	variant="filled" 
-		          	label="Item IMEI"
-		          />
-		          
-		          <TextField 
 		          	onChange={handleDateDelivered} 
 		          	defaultValue={renderDate(selectedItem?.dateDelivered)} 
 		          	variant="standard" 
@@ -865,7 +841,6 @@ const EditItemBox = props => {
 	          		if( !item || !item.name.length ||
 									!item.quantity ||
 									!item.srp ||
-									!item.imei ||
 									!item.dateDelivered ||
 									!item.dateReleased
 									) return enqueueSnackbar('All fields are required', { variant: 'error' });
