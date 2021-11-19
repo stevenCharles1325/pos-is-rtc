@@ -122,7 +122,7 @@ const Signup = props => {
 			return setErrMsg('Passwords did not match');
 		}
 
-		axios.post('http://localhost:3500/sign-up', user)
+		axios.post(`http://${window.address}:${window.port}/sign-up`, user)
 		.then( res => {
 			const { accessToken, refreshToken } = res.data;
 

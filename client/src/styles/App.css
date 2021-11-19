@@ -1,5 +1,15 @@
 .App {
   background-image: linear-gradient(250.39deg, #ECD975 23.16%, rgba(206, 163, 51, 0.58) 85.78%);
+  /*background-image: url('../images/heart1.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  max-width: 1000%;
+  height: auto;
+  background-size: 700px;*/
+
+
+  /*image-rendering*/
+  /*background-color: #e74c3c;*/
 
   width: 100vw;
   height: 100vh;
@@ -20,7 +30,6 @@
   width: 100%;
   height: 100%;
 }
-
 
 @media (max-width: 1075px) {
   .item {

@@ -154,7 +154,7 @@ const Appbar = props => {
 		<AppBar
 			sx={{
 				padding: '0 20px 0px 20px',
-				bgcolor: 'rgba(0, 0, 0, 0.7)',
+				bgcolor: '#000000',
 			}}
 		>
 			<Stack 

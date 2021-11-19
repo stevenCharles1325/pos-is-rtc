@@ -128,7 +128,7 @@ const Item = props => {
 					sx={{
 						width: '100%', 
 						height: '20%', 
-						backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+						backgroundColor: '#191970', 
 						color: 'white',
 						display: 'flex',
 						alignItems: 'center',
@@ -265,7 +265,7 @@ const Inventory = props => {
 	const getItems = async () => {
 		const token = Cookies.get('token');
 
-		axios.get('http://localhost:3500/shop-items', {
+		axios.get(`http://${window.address}:${window.port}/shop-items`, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -286,7 +286,7 @@ const Inventory = props => {
 
 		const token = Cookies.get('token');
 
-		axios.post('http://localhost:3500/add-shop-item', { item }, {
+		axios.post(`http://${window.address}:${window.port}/add-shop-item`, { item }, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -308,7 +308,7 @@ const Inventory = props => {
 
 		const token = Cookies.get('token');
 
-		axios.put('http://localhost:3500/update-shop-item', item, {
+		axios.put(`http://${window.address}:${window.port}/update-shop-item`, item, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -328,7 +328,7 @@ const Inventory = props => {
 		const ItemRemoval = async id => {
 			const token = Cookies.get('token');
 
-			axios.delete(`http://localhost:3500/delete-shop-item/${ id }`, {
+			axios.delete(`http://${window.address}:${window.port}/delete-shop-item/${ id }`, {
 				headers: {
 					'authentication': `Bearer ${ token }`
 				}
@@ -350,7 +350,7 @@ const Inventory = props => {
 	const buyItem = async ([id, name]) => {
 		const token = Cookies.get('token');
 
-		axios.put(`http://localhost:3500/buy-shop-item/${id}`, null, {
+		axios.put(`http://${window.address}:${window.port}/buy-shop-item/${id}`, null, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -370,7 +370,7 @@ const Inventory = props => {
 	const handleExport = async () => {
 		const token = Cookies.get('token');
 
-		axios.get('http://localhost:3500/export-record', {
+		axios.get(`http://${window.address}:${window.port}/export-record`, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -435,7 +435,8 @@ const Inventory = props => {
 			style={{
 				width: '100%',
 				height: '100%',
-				paddingTop: '10vh'
+				paddingTop: '10vh',
+				backgroundColor:'#C0C0C0'
 			}}
 			className="d-flex flex-column justify-content-center align-items-center"
 		>

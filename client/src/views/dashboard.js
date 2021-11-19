@@ -53,7 +53,7 @@ const Dashboard = props => {
 	                label: `Year ${Object.values( gData )[1]}`,
 	                data: Object.values( gData ).slice( 2, 14 ),
 	                fill: false,
-	                backgroundColor: ['rgb(255, 255, 255)', 'rgb(196, 196, 196)'],
+	                backgroundColor: ['rgb(100, 100, 100)', 'rgb(196, 196, 196)'],
 	                borderColor: 'rgba(255, 255, 255, 0.5)'
 	            }
 	        ] 
@@ -65,7 +65,7 @@ const Dashboard = props => {
 		const getGrapData = async () => {
 			const token = Cookies.get('token');
 
-			axios.get('http://localhost:3500/monthly-income-report', {
+			axios.get(`http://${window.address}:${window.port}/monthly-income-report`, {
 				headers: {
 					'authentication': `Bearer ${ token }`
 				}
@@ -90,7 +90,8 @@ const Dashboard = props => {
 				margin: '0',
 				paddingTop: '15vh',
 				overflowY: 'auto',
-				overflowX: 'hidden'
+				overflowX: 'hidden',
+				backgroundColor:'#708090'
 			}}
 			className="row d-flex justify-content-around align-items-center"
 		>	

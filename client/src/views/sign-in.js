@@ -55,7 +55,7 @@ const Signin = props => {
 	};
 
 	const signIn = async () => {
-		axios.post('http://localhost:3500/sign-in', user)
+		axios.post(`http://${window.address}:${window.port}/sign-in`, user)
 		.then( res => {
 			const { accessToken, refreshToken } = res.data;
 
@@ -108,9 +108,10 @@ const Signin = props => {
 				<Typography 
 					variant="h3" 
 					sx={{ 
-						color: 'rgba(0, 0, 0, 0.4)', 
+						color: '#000000',
 						fontFamily: 'Poppins',
-						letterSpacing: '5px'
+						letterSpacing: '5px',
+						
 					}}
 				>
 					SIGN-IN
@@ -122,9 +123,10 @@ const Signin = props => {
 					width: '100%',
 					height: '30%'
 				}} 
+
 				className="d-flex flex-column justify-content-around align-items-center"
 			>
-				<TextField sx={{width: '25ch'}} onChange={setUsername} id="sign-in-uname" label="username" variant="standard" />
+				<TextField sx={{width: '25ch'}} onChange={setUsername} id="sign-in-uname" label="Username" variant="standard" />
 				<FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
 					<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
 					<Input 
@@ -151,7 +153,7 @@ const Signin = props => {
 					<Button 
 						onClick={() => setSigningIn( true )} 
 						disabled={ btnMsg === 'loading' ? true : false } 
-						sx={{borderColor: 'black', color: 'black'}} 
+						sx={{borderColor: 'black', color: 'white'}} 
 						variant="outlined"
 					> 
 						{ btnMsg } 

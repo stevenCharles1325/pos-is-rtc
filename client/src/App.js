@@ -60,7 +60,7 @@ function App() {
     const token = Cookies.get('token');
     const rtoken = Cookies.get('rtoken');
 
-    axios.get('http://localhost:3500/verify-me', {
+    axios.get(`http://${window.address}:${window.port}/verify-me`, {
       headers: {
         'authentication': `Bearer ${ token }`
       }
@@ -70,7 +70,7 @@ function App() {
       setAllow(() => true);
     })
     .catch( err => {
-      axios.post('http://localhost:3500/auth/refresh-token', { rtoken })
+      axios.post(`http://${window.address}:${window.port}/auth/refresh-token`, { rtoken })
       .then( res => {
         Cookies.set('token', res.data.accessToken);
         runAuth();

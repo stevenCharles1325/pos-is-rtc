@@ -4,6 +4,10 @@ import './styles/index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 // import reportWebVitals from './reportWebVitals';
+// http://192.168.1.19:3000/
+// 
+window.address = '192.168.1.15';
+window.port = '3500';
 
 ReactDOM.render(
   <React.StrictMode>
