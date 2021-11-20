@@ -14,11 +14,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
+const Accounts = React.lazy(() => import('./views/accounts'));
 const Dashboard = React.lazy(() => import('./views/dashboard'));
 const Inventory = React.lazy(() => import('./views/inventory'));
 const Appbar = React.lazy(() => import('./components/app-bar'));
 const Signin = React.lazy(() => import('./views/sign-in'));
-const Signup = React.lazy(() => import('./views/sign-up'));
+// const Signup = React.lazy(() => import('./views/sign-up'));
 
 
 const ROOT = '/';
@@ -27,7 +28,8 @@ const VIEWS = [
   `${ROOT}sign-up`,  // 1
   `${ROOT}sign-in`,  // 2
   `${ROOT}inventory`,// 3
-  `${ROOT}dashboard` // 4
+  `${ROOT}dashboard`, // 4
+  `${ROOT}account` // 5
 ];
 
 const validator = new Validator();
@@ -39,7 +41,9 @@ function App() {
   const [name, setName] = React.useState( null );
   const [view, setView] = React.useState( null );
   const [allow, setAllow] = React.useState( null );
+  const [role, setRole] = React.useState( null );
   const [search, setSearch] = React.useState( '' );
+
 
   const setToThisView = ( viewPath ) => {
     setView(() => <Redirect to={viewPath} />);
@@ -47,6 +51,7 @@ function App() {
   }
 
   const tools = { 
+    role,
     name,
     search,
     setName,
@@ -67,6 +72,7 @@ function App() {
     })
     .then( res => {
       setName( res.data.user.name );
+      setRole( res.data.user.role );
       setAllow(() => true);
     })
     .catch( err => {
@@ -86,16 +92,15 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    const location = window.location.pathname;
 
     if( allow ){
-      switch( location ){
+      switch( path.pathname ){
         case '/dashboard':
-          setToThisView( location );
+          setToThisView( path.pathname );
           break;
 
         case '/inventory':
-          setToThisView( location );
+          setToThisView( path.pathname );
           break;
 
         default:
@@ -105,13 +110,9 @@ function App() {
       // return setAllow(() => null);
     }
     else if( allow === false ){
-      switch( location ){
+      switch( path.pathname ){
         case '/sign-in':
-          setToThisView( location );
-          break;
-
-        case '/sign-up':
-          setToThisView( location );
+          setToThisView( path.pathname );
           break;
 
         default:
@@ -146,6 +147,11 @@ function App() {
                         <Appbar tools={tools}/>
                         <Dashboard tools={tools}/>
                       </Route>
+
+                      <Route exact path="/accounts">
+                        <Appbar tools={tools}/>
+                        <Accounts tools={tools}/>
+                      </Route>
                     </>
                   )
                 : null
@@ -154,15 +160,9 @@ function App() {
             {
               allow === false 
                 ? (
-                    <>
                       <Route path="/sign-in">
                         <Signin tools={tools}/>
                       </Route>
-
-                      <Route path="/sign-up">
-                        <Signup tools={tools}/>
-                      </Route>
-                    </>
                   )
                 : null
             }

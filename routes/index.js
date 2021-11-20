@@ -47,7 +47,7 @@ router.post('/sign-in', async (req, res, next) => {
     if( err ) return res.sendStatus( 500 );
 
     if( doc ){
-      const user = { name: username };
+      const user = { name: username, role: doc.role };
       const accessToken = requestAccessToken( user );
       const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
 
@@ -78,7 +78,7 @@ router.post('/sign-up', async (req, res, next) => {
 
     if( doc ) return res.status( 403 ).json({ message: 'Username is already used' });
 
-    const user = { name: username };
+    const user = { name: username, role: doc.role };
     const accessToken = requestAccessToken( user );
     const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
 
@@ -91,30 +91,18 @@ router.post('/sign-up', async (req, res, next) => {
       if( !doc.length ) role = 'admin';
 
       if( role === 'normal' ){
-        User.find({ password: masterPass }, (err, doc) => {
+        Token.create({ code: refreshToken }, err => {
           if( err ) return res.sendStatus( 500 );
 
-          if( doc.length ){
-            // create token and then the account
-            Token.create({ code: refreshToken }, err => {
-              if( err ) return res.sendStatus( 500 );
+          User.create({ role: role, username: username, password: password }, err => {
+            if( err ) return res.sendStatus( 500 );
 
-              User.create({ role: role, username: username, password: password }, err => {
-                if( err ) return res.sendStatus( 500 );
-
-                return res.json({
-                  message: `Welcome ${ username }!`,
-                  accessToken,
-                  refreshToken
-                });
-              })
+            return res.json({
+              message: `Welcome ${ username }!`,
+              accessToken,
+              refreshToken
             });
-          }
-          else{
-            return res.status( 403 ).json({
-              message: 'Master password is Incorrect'
-            })
-          }
+          })
         });
       }
       else{
@@ -360,6 +348,43 @@ router.get('/monthly-income-report', authentication, async( req, res, next ) => 
   });
 });
 
+
+
+router.get('/get-nonadmin-users', async( req, res ) => {
+  User.find({ role: 'normal' }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+    
+    return res.json( doc );    
+  });
+});
+
+
+router.put('/update-user/:id', async( req, res ) => {
+  User.findOneAndUpdate({ _id: req.params.id }, { ...req.body }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+
+    return res.json({ message: 'Updated user successfully' });
+  });
+});
+
+
+router.delete('/delete-user/:id', async( req, res ) => {
+  User.deleteOne({ _id: req.params.id }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json({ message: 'Deleted user successfully' });
+  });
+});
+
+router.post('/add-user', async( req, res ) => {
+  console.log( req.body );
+  User.create({ role: 'normal', ...req.body }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json({ message: 'Added user successfully' });
+  });
+});
 
 
 module.exports = router;

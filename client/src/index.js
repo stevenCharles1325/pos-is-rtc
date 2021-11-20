@@ -4,14 +4,14 @@ import './styles/index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-window.address = '192.168.1.15';
 window.port = '3500';
+window.address = '192.168.1.13';
 
 ReactDOM.render(
   <React.StrictMode>
     <Router basename="/">
-      <App />
-    </Router>
+      <App />   
+    </Router>    
   </React.StrictMode>,
   document.getElementById('root')
 );
@@ -20,3 +20,6 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 // reportWebVitals();
+
+// clareClaaa 
+// asdfasdfasdf@@S

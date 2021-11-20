@@ -44,6 +44,13 @@ import { useSnackbar } from 'notistack';
 
 import Stack from '@mui/material/Stack';
 
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -95,7 +102,8 @@ const Item = props => {
 		handleEditBox,
 		handleUpdate,
 		handleDelete,
-		buy
+		buy,
+		update
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -111,127 +119,164 @@ const Item = props => {
 		if( count === 0 ){
 			enqueueSnackbar(`${props.name} has been sold out`, { variant: 'success' });
 		}	
+		else{
+
+		}
 	}, [count]);
 
 	return(
-		<div 
-			style={{
-				height: '300px'
-			}}
-			className="item col-md-3"
-			onPointerEnter={() => setElevated( true )}
-			onPointerLeave={() => setElevated( false )}
-		>	
-			<Paper sx={{width: '100%', height: '80%'}} elevation={!elevated ? 5 : 15}>
-				<Paper 
-					square 
-					sx={{
-						width: '100%', 
-						height: '20%', 
-						backgroundColor: '#191970', 
-						color: 'white',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'space-between',
-						padding: '0 10px 0 10px'
-					}} 
-					elevation={ 3 }
-				>
-					<Tooltip title={props?.name ?? 'No name item'}>
-						<Typography 
-							sx={{ 
-								whiteSpace: 'nowrap',
-								overflow: 'hidden'
-							}} 
-							variant="h5"
-						>
-							{ props?.name?.split?.(' ')?.[ 0 ] ?? 'Item' }
-						</Typography>
-					</Tooltip>
-
-					<Stack direction="row" spacing={2}>
-						{/*Edit button*/}
-						<Tooltip title="Edit item">
-							<IconButton 
-								onClick={() => {
-									setSelectedItem({
-										_id: props._id,
-										name: props.name,
-										quantity: count,
-										srp: props.srp,
-										imei: props.imei,
-										dateDelivered: props.dateDelivered,
-										dateReleased: props.dateReleased
-									});
-
-									handleEditBox();
-									setElevated( false );
-								}} 
-								color="inherit"
-							>
-								<EditIcon fontSize="small" sx={{ color: 'white' }}/>
-							</IconButton>
-						</Tooltip>
-
-						{/*Cart button*/}
-						{
-							count 
-								? ( 
-									<Tooltip title="Sell 1">
-										<IconButton onClick={() => handleBuy()} color="inherit">
-											<ShoppingCartIcon fontSize="small" sx={{ color: 'white' }}/>
-										</IconButton>
-									</Tooltip>
-								)
-								: (
-									<IconButton disabled color="inherit">
-										<RemoveShoppingCartIcon fontSize="small" sx={{ color: '#ff7675' }}/>
-									</IconButton>
-								)
-						}
-
-						{/*Delete button*/}
-						<Tooltip title="Delete item">
-							<IconButton onClick={() => handleDelete( props._id )} color="inherit">
-								<DeleteIcon fontSize="small" sx={{ color: 'white' }}/>
-							</IconButton>
-						</Tooltip>
-					</Stack>
-				</Paper>
-				<Box
-					sx={{ 
-						width: '100%', 
-						height: '80%',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						padding: '0 5% 0 5%'
+		<TableRow>
+			<TableCell component="th" scope="row"> { props.name } </TableCell>
+			<TableCell align="right"> { count } </TableCell>
+			<TableCell align="right"> { props.srp } </TableCell>
+			<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>
+			<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>
+			<TableCell align="center">
+				<IconButton 
+					onClick={() => {
+						setSelectedItem({
+							_id: props._id,
+							name: props.name,
+							quantity: count,
+							srp: props.srp,
+							imei: props.imei,
+							dateDelivered: props.dateDelivered,
+							dateReleased: props.dateReleased
+						});
+						handleEditBox();
 					}}
 				>
-					<Stack
-						orientation="vertical"
-						spacing={2}
-					>	
-						<TextField 
-							id="item-quant" 
-							disabled 
-							variant="filled" 
-							type="number" 
-							label="Item quantity" 
-							value={`${count ?? 0}`}
-						/>
-						<TextField 
-							disabled 
-							variant="filled" 
-							label="Item price" 
-							defaultValue={`₱ ${props.srp ?? 0}`}
-						/>
-					</Stack>
-				</Box>
-			</Paper>
-		</div>
+					<EditIcon/>
+				</IconButton>
+				
+				<IconButton onClick={() => handleBuy()}>
+					<ShoppingCartIcon/>
+				</IconButton>
+
+				<IconButton onClick={() => handleDelete( props._id )}>
+					<DeleteIcon/>
+				</IconButton>
+			</TableCell>
+		</TableRow>
 	);
 }
+
+// <div 
+// 			style={{
+// 				height: '300px'
+// 			}}
+// 			className="item col-md-3"
+// 			onPointerEnter={() => setElevated( true )}
+// 			onPointerLeave={() => setElevated( false )}
+// 		>	
+// 			<Paper sx={{width: '100%', height: '80%'}} elevation={!elevated ? 5 : 15}>
+// 				<Paper 
+// 					square 
+// 					sx={{
+// 						width: '100%', 
+// 						height: '20%', 
+// 						backgroundColor: '#191970', 
+// 						color: 'white',
+// 						display: 'flex',
+// 						alignItems: 'center',
+// 						justifyContent: 'space-between',
+// 						padding: '0 10px 0 10px'
+// 					}} 
+// 					elevation={ 3 }
+// 				>
+// 					<Tooltip title={props?.name ?? 'No name item'}>
+// 						<Typography 
+// 							sx={{ 
+// 								whiteSpace: 'nowrap',
+// 								overflow: 'hidden'
+// 							}} 
+// 							variant="h5"
+// 						>
+// 							{ props?.name?.split?.(' ')?.[ 0 ] ?? 'Item' }
+// 						</Typography>
+// 					</Tooltip>
+
+// 					<Stack direction="row" spacing={2}>
+// 						{/*Edit button*/}
+// 						<Tooltip title="Edit item">
+// 							<IconButton 
+// 								onClick={() => {
+// 									setSelectedItem({
+// 										_id: props._id,
+// 										name: props.name,
+// 										quantity: count,
+// 										srp: props.srp,
+// 										imei: props.imei,
+// 										dateDelivered: props.dateDelivered,
+// 										dateReleased: props.dateReleased
+// 									});
+
+// 									handleEditBox();
+// 									setElevated( false );
+// 								}} 
+// 								color="inherit"
+// 							>
+// 								<EditIcon fontSize="small" sx={{ color: 'white' }}/>
+// 							</IconButton>
+// 						</Tooltip>
+
+// 						{/*Cart button*/}
+// 						{
+// 							count 
+// 								? ( 
+// 									<Tooltip title="Sell 1">
+// 										<IconButton onClick={() => handleBuy()} color="inherit">
+// 											<ShoppingCartIcon fontSize="small" sx={{ color: 'white' }}/>
+// 										</IconButton>
+// 									</Tooltip>
+// 								)
+// 								: (
+// 									<IconButton disabled color="inherit">
+// 										<RemoveShoppingCartIcon fontSize="small" sx={{ color: '#ff7675' }}/>
+// 									</IconButton>
+// 								)
+// 						}
+
+// 						{/*Delete button*/}
+// 						<Tooltip title="Delete item">
+// 							<IconButton onClick={() => handleDelete( props._id )} color="inherit">
+// 								<DeleteIcon fontSize="small" sx={{ color: 'white' }}/>
+// 							</IconButton>
+// 						</Tooltip>
+// 					</Stack>
+// 				</Paper>
+// 				<Box
+// 					sx={{ 
+// 						width: '100%', 
+// 						height: '80%',
+// 						display: 'flex',
+// 						alignItems: 'center',
+// 						justifyContent: 'center',
+// 						padding: '0 5% 0 5%'
+// 					}}
+// 				>
+// 					<Stack
+// 						orientation="vertical"
+// 						spacing={2}
+// 					>	
+// 						<TextField 
+// 							id="item-quant" 
+// 							disabled 
+// 							variant="filled" 
+// 							type="number" 
+// 							label="Item quantity" 
+// 							value={`${count ?? 0}`}
+// 						/>
+// 						<TextField 
+// 							disabled 
+// 							variant="filled" 
+// 							label="Item price" 
+// 							defaultValue={`₱ ${props.srp ?? 0}`}
+// 						/>
+// 					</Stack>
+// 				</Box>
+// 			</Paper>
+// 		</div>
 
 const Inventory = props => {
 	const { errorHandler, search, setSearch } = props.tools;
@@ -397,8 +442,6 @@ const Inventory = props => {
 		return () => window.removeEventListener('resize', resize);
 	}, []);
 
-	React.useEffect(() => getItems(), []);
-
 	const handleSearching = async () => {
 		let filtered = [];
 
@@ -426,9 +469,11 @@ const Inventory = props => {
 		setRenderedItems([ ...filtered ]);
 	}
 
-	const memoizedFiltering = React.useCallback(debounce( handleSearching, 500 ), [search, items]);
+	const debouncedFiltering = debounce( handleSearching, 500 );
+	const memoizedFiltering = React.useCallback(debouncedFiltering, [search, items]);
 
 	React.useEffect(() => memoizedFiltering(), [search, items]);
+	React.useEffect(() => getItems(), []);
 
 	return(
 		<div 
@@ -474,10 +519,10 @@ const Inventory = props => {
 					overflowX: 'hidden',
 					padding: '3% 10% 0 10%'
 				}}
-				className="row d-flex justify-content-around align-items-center"
+				className="row d-flex justify-content-around align-items-start"
 			>
 				{/*ITEM AREA*/}
-				{ 
+				{/*{ 
 					renderedItems.length 
 						? renderedItems 
 						: search.length 
@@ -507,37 +552,57 @@ const Inventory = props => {
 						        </Typography>
 									</div>
 								)
-				}
+				}*/}
+
+				<TableContainer component={Paper}>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>Item name</TableCell>
+		            <TableCell align="right">Quantity</TableCell>
+		            <TableCell align="right">Price</TableCell>
+		            <TableCell align="right">Date delivered</TableCell>
+		            <TableCell align="right">Date released</TableCell>
+		            <TableCell align="center"> Actions </TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{ renderedItems }
+						</TableBody>
+					</Table>
+				</TableContainer>
 			</div>
 			<SpeedDial
-		        ariaLabel="speed dial"
-		        sx={{ position: 'absolute', bottom: 16, right: 30 }}
-		        icon={<SpeedDialIcon />}
-		     >
-		        {
-		        	actions.map((action, index) => (
-			          <SpeedDialAction
-			            key={action.name}
-			            icon={action.icon}
-			            tooltipTitle={action.name}
-			            onClick={[handleAddBox, handleExport][ index ]}
-			          />
-			        ))
-			    }
-	      	</SpeedDial>
-	      	<AddItemBox 
-		      	addItem={addItem}
-	      		fullScreen={fullScreen} 
-	      		openAddBox={openAddBox} 
-	      		handleAddBox={handleAddBox}
-	      	/>
-	      	<EditItemBox 
-	      		editItem={updateItem}
-	      		fullScreen={fullScreen} 
-	      		openEditBox={openEditBox} 
-	      		selectedItem={selectedItem}
-	      		handleEditBox={handleEditBox}
-	      	/> 
+        ariaLabel="speed dial"
+        sx={{ position: 'absolute', bottom: 16, right: 30 }}
+        icon={<SpeedDialIcon />}
+	     >
+	        {
+	        	actions.map((action, index) => (
+		          <SpeedDialAction
+		            key={action.name}
+		            icon={action.icon}
+		            tooltipTitle={action.name}
+		            onClick={[handleAddBox, handleExport][ index ]}
+		          />
+		        ))
+	    }
+    	</SpeedDial>
+    	<AddItemBox 
+    		update={getItems}
+      	addItem={addItem}
+    		fullScreen={fullScreen} 
+    		openAddBox={openAddBox} 
+    		handleAddBox={handleAddBox}
+    	/>
+    	<EditItemBox 
+    		update={getItems}
+    		editItem={updateItem}
+    		fullScreen={fullScreen} 
+    		openEditBox={openEditBox} 
+    		selectedItem={selectedItem}
+    		handleEditBox={handleEditBox}
+    	/> 
 		</div>
 	);
 }
@@ -547,7 +612,8 @@ const AddItemBox = props => {
 		addItem,
 		fullScreen,
 		openAddBox,
-		handleAddBox
+		handleAddBox,
+		update
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -662,6 +728,7 @@ const AddItemBox = props => {
 
 	          		handleAddBox();
 	          		addItem( item );
+	          		update();
 	          	}} 
 	          	autoFocus
 	          >
@@ -679,7 +746,8 @@ const EditItemBox = props => {
 		fullScreen,
 		openEditBox,
 		selectedItem,
-		handleEditBox
+		handleEditBox,
+		update
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -848,6 +916,7 @@ const EditItemBox = props => {
 	          		
 	          		handleEditBox();
 	          		editItem( item );
+	          		update();
 	          	}} 
 	          	autoFocus
 	          >

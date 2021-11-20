@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
+import uniqid from 'uniqid';
 
 // import Link from '@mui/material/Link';
 import Menu from '@mui/material/Menu';
@@ -15,8 +16,21 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import SearchIcon from '@mui/icons-material/Search';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import InputBase from '@mui/material/InputBase';
 import Tooltip from '@mui/material/Tooltip';
+import MenuIcon from '@mui/icons-material/Menu';
+
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -91,12 +105,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Appbar = props => {
 	const { 
+		role,
 		name, 
 		search,
 		setSearch, 
 		setToThisView
 	} = props.tools;
-	
+
+	const [viewList, setViewList] = React.useState([{
+					title: 'Dashboard',
+					onClick: () => setToThisView('/dashboard')
+				},{
+					title: 'Inventory',
+					onClick: () => setToThisView('/inventory')
+				}
+		]);
+
+	const [drawer, setDrawer] = React.useState( false );
 	const [anchorEl, setAnchorEl] = React.useState( null );
 	const open = Boolean( anchorEl );
 
@@ -110,7 +135,7 @@ const Appbar = props => {
 		setAnchorEl( null );
 	}
 
-	const handleSignOut = () => {
+	const handleSignOut = async () => {
 		setAnchorEl( null );
 
 		const token = Cookies.get('token');
@@ -143,12 +168,49 @@ const Appbar = props => {
 		setSearch( e.target.value );
 	}
 
+	const toggleDrawer = (anchor, open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    setDrawer( false );
+  };
+
+	const list = () => (
+	    <Box
+	      sx={{ width: 240, padding: '10px 20px 20px 10px' }}
+	      role="presentation"
+	      onClick={toggleDrawer(false)}
+	      onKeyDown={toggleDrawer(false)}
+	    >
+			<List>
+				{viewList.map((item, index) => (
+					<ListItem key={uniqid()} button onClick={item.onClick}>
+						<ListItemIcon>
+							<ArrowForwardIosIcon fontSize="small" />
+						</ListItemIcon>
+						<ListItemText primary={item.title} />
+					</ListItem>
+				))}
+			</List>
+	    </Box>
+	);
 
 	React.useEffect(() => {
 		window.addEventListener('resize', resize);
 
 		return () => window.removeEventListener('resize', resize);
 	}, []);
+
+	React.useEffect(() => {
+		if( role === 'admin' ){
+			viewList.push({
+					title: 'Accounts',
+					onClick: () => setToThisView('/accounts')
+				});
+		}
+		console.log( role );
+	}, [role]);
 
 	return(
 		<AppBar
@@ -167,7 +229,24 @@ const Appbar = props => {
 					justifyContent: 'space-between'
 				}}
 			>
-				<Breadcrumbs
+				<IconButton
+					size="large"
+					edge="start"
+					color="inherit"
+					aria-label="open drawer"
+					sx={{ mr: 2 }}
+					onClick={() => setDrawer( true )}
+				>
+					<MenuIcon />
+				</IconButton>
+				<Drawer
+	          anchor="left"
+	          open={drawer}
+	          onClose={toggleDrawer(false)}
+	        >
+	          { list() }
+	      </Drawer>
+				{/*<Breadcrumbs
 					color="rgba(255, 255, 255, 0.8)"
 				>
 					<Link 
@@ -194,8 +273,14 @@ const Appbar = props => {
 							inventory
 						</Typography>
 					</Link>
-				</Breadcrumbs>
-
+				</Breadcrumbs>*/}
+				<Drawer
+          anchor="left"
+          open={drawer}
+          onClose={toggleDrawer(false)}
+        >
+            { list() }
+        </Drawer>
 				{
 					windowWidth > 620 && window.location.pathname.includes('inventory')
 						? (
