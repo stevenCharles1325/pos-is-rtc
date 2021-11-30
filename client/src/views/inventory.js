@@ -51,6 +51,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
+import Pagination from '@mui/material/Pagination';
+
+
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -91,6 +94,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+
 const actions = [
 	{ icon: <AddIcon/>, name: 'Add an item' },
 	{ icon: <ArrowCircleDownIcon/>, name: 'Download as spreadsheet'}
@@ -125,13 +129,13 @@ const Item = props => {
 	}, [count]);
 
 	return(
-		<TableRow>
-			<TableCell component="th" scope="row"> { props.name } </TableCell>
-			<TableCell align="right"> { count } </TableCell>
-			<TableCell align="right"> { props.srp } </TableCell>
+		<TableRow sx={{ paddingTop: '5px', paddingBottom: '5px' }}>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.name } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { count } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.srp } </TableCell>
 			<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>
 			<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>
-			<TableCell align="center">
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="center">
 				<IconButton 
 					onClick={() => {
 						setSelectedItem({
@@ -161,124 +165,11 @@ const Item = props => {
 	);
 }
 
-// <div 
-// 			style={{
-// 				height: '300px'
-// 			}}
-// 			className="item col-md-3"
-// 			onPointerEnter={() => setElevated( true )}
-// 			onPointerLeave={() => setElevated( false )}
-// 		>	
-// 			<Paper sx={{width: '100%', height: '80%'}} elevation={!elevated ? 5 : 15}>
-// 				<Paper 
-// 					square 
-// 					sx={{
-// 						width: '100%', 
-// 						height: '20%', 
-// 						backgroundColor: '#191970', 
-// 						color: 'white',
-// 						display: 'flex',
-// 						alignItems: 'center',
-// 						justifyContent: 'space-between',
-// 						padding: '0 10px 0 10px'
-// 					}} 
-// 					elevation={ 3 }
-// 				>
-// 					<Tooltip title={props?.name ?? 'No name item'}>
-// 						<Typography 
-// 							sx={{ 
-// 								whiteSpace: 'nowrap',
-// 								overflow: 'hidden'
-// 							}} 
-// 							variant="h5"
-// 						>
-// 							{ props?.name?.split?.(' ')?.[ 0 ] ?? 'Item' }
-// 						</Typography>
-// 					</Tooltip>
-
-// 					<Stack direction="row" spacing={2}>
-// 						{/*Edit button*/}
-// 						<Tooltip title="Edit item">
-// 							<IconButton 
-// 								onClick={() => {
-// 									setSelectedItem({
-// 										_id: props._id,
-// 										name: props.name,
-// 										quantity: count,
-// 										srp: props.srp,
-// 										imei: props.imei,
-// 										dateDelivered: props.dateDelivered,
-// 										dateReleased: props.dateReleased
-// 									});
-
-// 									handleEditBox();
-// 									setElevated( false );
-// 								}} 
-// 								color="inherit"
-// 							>
-// 								<EditIcon fontSize="small" sx={{ color: 'white' }}/>
-// 							</IconButton>
-// 						</Tooltip>
-
-// 						{/*Cart button*/}
-// 						{
-// 							count 
-// 								? ( 
-// 									<Tooltip title="Sell 1">
-// 										<IconButton onClick={() => handleBuy()} color="inherit">
-// 											<ShoppingCartIcon fontSize="small" sx={{ color: 'white' }}/>
-// 										</IconButton>
-// 									</Tooltip>
-// 								)
-// 								: (
-// 									<IconButton disabled color="inherit">
-// 										<RemoveShoppingCartIcon fontSize="small" sx={{ color: '#ff7675' }}/>
-// 									</IconButton>
-// 								)
-// 						}
-
-// 						{/*Delete button*/}
-// 						<Tooltip title="Delete item">
-// 							<IconButton onClick={() => handleDelete( props._id )} color="inherit">
-// 								<DeleteIcon fontSize="small" sx={{ color: 'white' }}/>
-// 							</IconButton>
-// 						</Tooltip>
-// 					</Stack>
-// 				</Paper>
-// 				<Box
-// 					sx={{ 
-// 						width: '100%', 
-// 						height: '80%',
-// 						display: 'flex',
-// 						alignItems: 'center',
-// 						justifyContent: 'center',
-// 						padding: '0 5% 0 5%'
-// 					}}
-// 				>
-// 					<Stack
-// 						orientation="vertical"
-// 						spacing={2}
-// 					>	
-// 						<TextField 
-// 							id="item-quant" 
-// 							disabled 
-// 							variant="filled" 
-// 							type="number" 
-// 							label="Item quantity" 
-// 							value={`${count ?? 0}`}
-// 						/>
-// 						<TextField 
-// 							disabled 
-// 							variant="filled" 
-// 							label="Item price" 
-// 							defaultValue={`₱ ${props.srp ?? 0}`}
-// 						/>
-// 					</Stack>
-// 				</Box>
-// 			</Paper>
-// 		</div>
 
 const Inventory = props => {
+	const chunksLimit = 7;
+	const [page, setPage] = React.useState( 1 );
+
 	const { errorHandler, search, setSearch } = props.tools;
 	const { enqueueSnackbar } = useSnackbar();
 
@@ -443,7 +334,10 @@ const Inventory = props => {
 	}, []);
 
 	const handleSearching = async () => {
+		// if( !items.length ) return;
+
 		let filtered = [];
+		let chunkSet = [];
 
 		const addToFilteredItems = item => {
 			filtered.push((
@@ -461,16 +355,23 @@ const Inventory = props => {
 		}
 
 		items.forEach( item => {
-			if(item.name.includes( search )){
+			if(item.name.toLowerCase().includes( search.toLowerCase() )){
 				addToFilteredItems( item );
 			}
 		});	
 
-		setRenderedItems([ ...filtered ]);
+		let index = 0;
+		for( let i = 0; i < Math.floor(filtered.length / chunksLimit); i++ ){
+			const chunk = filtered.slice(index, chunksLimit);
+			chunkSet.push( chunk );
+			
+			index += chunksLimit;
+		}
+
+		setRenderedItems([ ...chunkSet ]);
 	}
 
-	const debouncedFiltering = debounce( handleSearching, 500 );
-	const memoizedFiltering = React.useCallback(debouncedFiltering, [search, items]);
+	const memoizedFiltering = React.useCallback(() => handleSearching(), [search, items]);
 
 	React.useEffect(() => memoizedFiltering(), [search, items]);
 	React.useEffect(() => getItems(), []);
@@ -553,24 +454,31 @@ const Inventory = props => {
 									</div>
 								)
 				}*/}
-
-				<TableContainer component={Paper}>
-					<Table>
-						<TableHead>
-							<TableRow>
-								<TableCell>Item name</TableCell>
-		            <TableCell align="right">Quantity</TableCell>
-		            <TableCell align="right">Price</TableCell>
-		            <TableCell align="right">Date delivered</TableCell>
-		            <TableCell align="right">Date released</TableCell>
-		            <TableCell align="center"> Actions </TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{ renderedItems }
-						</TableBody>
-					</Table>
-				</TableContainer>
+				<Paper sx={{ height: '500px' }}>
+					<Stack sx={{ height: '500px' }} direction="column" justifyContent="space-between" alignItems="center">
+						<TableContainer>
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell><b>Item name</b></TableCell>
+				            <TableCell align="right"><b>Quantity</b></TableCell>
+				            <TableCell align="right"><b>Price</b></TableCell>
+				            <TableCell align="right"><b>Date delivered</b></TableCell>
+				            <TableCell align="right"><b>Date released</b></TableCell>
+				            <TableCell align="center"><b>Action</b></TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{ console.log( renderedItems ) }
+									{ renderedItems[ page - 1 ] }
+								</TableBody>
+							</Table>
+						</TableContainer>
+						<div style={{ width: '100%' }} className="my-2 d-flex flex-column justify-content-center align-items-center">
+							<Pagination count={ renderedItems.length } page={page} onChange={(_, value) => setPage( value )}/>
+						</div>
+					</Stack>
+				</Paper>
 			</div>
 			<SpeedDial
         ariaLabel="speed dial"
@@ -690,51 +598,51 @@ const AddItemBox = props => {
 	return(
 		<Dialog
 			fullWidth={true}
-	        fullScreen={fullScreen}
-	        open={openAddBox}
-	        onClose={handleAddBox}
-	        aria-labelledby="responsive-dialog-title"
-	        maxWidth="md"
-	    >
-	        <DialogTitle id="responsive-dialog-title">
-	          {'Add item'}
-	        </DialogTitle>
-	        <DialogContent>
-	          <DialogContentText>
-	            Please fill up all text fields.
-	          </DialogContentText>
+      fullScreen={fullScreen}
+      open={openAddBox}
+      onClose={handleAddBox}
+      aria-labelledby="responsive-dialog-title"
+      maxWidth="md"
+	  >
+      <DialogTitle id="responsive-dialog-title">
+        {'Add item'}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Please fill up all text fields.
+        </DialogContentText>
 
-	          <Stack spacing={5}>
-		          <TextField onChange={handleName} autoFocus variant="filled" label="Item name"/>
-		          <TextField onChange={handleCount} variant="filled" type="number" label="Item quantity"/>
-		          <TextField onChange={handleSrp} variant="filled" type="number" label="Item price"/>
-		          <TextField onChange={handleDateDelivered} variant="standard" type='date' helperText="Date delivered"/>
-		          <TextField onChange={handleDateReleased} variant="standard" type='date' helperText="Date released"/>
-		      </Stack>
-	        </DialogContent>
-	        
-	        <DialogActions>
-	          <Button onClick={handleAddBox}>
-	            Discard
-	          </Button>
-	          <Button 
-	          	onClick={() => {
-	          		if( !item || !item.name.length ||
-									!item.quantity ||
-									!item.srp ||
-									!item.dateDelivered ||
-									!item.dateReleased
-									) return enqueueSnackbar('All fields are required', { variant: 'error' });
+        <Stack spacing={5}>
+          <TextField onChange={handleName} autoFocus variant="filled" label="Item name"/>
+          <TextField onChange={handleCount} variant="filled" type="number" label="Item quantity"/>
+          <TextField onChange={handleSrp} variant="filled" type="number" label="Item price"/>
+          <TextField onChange={handleDateDelivered} variant="standard" type='date' helperText="Date delivered"/>
+          <TextField onChange={handleDateReleased} variant="standard" type='date' helperText="Date released"/>
+      </Stack>
+      </DialogContent>
+      
+      <DialogActions>
+        <Button onClick={handleAddBox}>
+          Discard
+        </Button>
+        <Button 
+        	onClick={() => {
+        		if( !item || !item.name.length ||
+							!item.quantity ||
+							!item.srp ||
+							!item.dateDelivered ||
+							!item.dateReleased
+							) return enqueueSnackbar('All fields are required', { variant: 'error' });
 
-	          		handleAddBox();
-	          		addItem( item );
-	          		update();
-	          	}} 
-	          	autoFocus
-	          >
-	            Add
-	          </Button>
-	        </DialogActions>
+        		handleAddBox();
+        		addItem( item );
+        		update();
+        	}} 
+        	autoFocus
+        >
+          Add
+        </Button>
+      </DialogActions>
 		</Dialog>
 	);
 }

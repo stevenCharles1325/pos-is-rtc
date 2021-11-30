@@ -11,6 +11,8 @@ var User = require('../models/users');
 var Item = require('../models/items');
 var Token = require('../models/tokens');
 var MonIncome = require('../models/monthlyIncome');
+var Purchases = require('../models/purchases');
+var Delivers = require('../models/delivers');
 
 
 const requestAccessToken = ( user ) => {
@@ -168,27 +170,47 @@ router.get('/shop-items', authentication, async ( req, res ) => {
   Item.find({}, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    return res.status( 200 ).json({ items: doc, message: 'Successfully fetched all items' });
+    return res.json({ items: doc, message: 'Successfully fetched all items' });
   });
 });
+
+
+router.get('/purchase-history', async ( req, res ) => {
+  Purchases.find({}, (err, docs) => {
+    if( err ) return res.sendStatus( 503 );
+
+    console.log( docs );
+    return res.json({ items: docs, message: 'Successfully fetched all items' });
+  });
+});
+
+
+router.get('/deliver-history', async ( req, res ) => {
+  Delivers.find({}, (err, docs) => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json({ items: doc, message: 'Successfully fetched all items' });
+  });
+});
+
 
 router.post('/add-shop-item', authentication, async ( req, res ) => {
   const { item } = req.body;
 
-  Item.find({ name: item.name }, (err, doc) => {
+  Item.create({ ...item }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    if( doc && doc.length ){
-      return res.status( 403 ).json({ message: 'Item already exists' });
-    }
-    else{
-      Item.create({ ...item }, (err, doc) => {
-        if( err ) return res.sendStatus( 503 );
-
-        return res.status( 200 ).json({ item: doc, message: 'Successfully added an items' });
-      });
-    }
+    return res.status( 200 ).json({ item: doc, message: 'Successfully added an items' });
   });
+  // Item.find({ name: item.name }, (err, doc) => {
+  //   if( err ) return res.sendStatus( 503 );
+
+  //   if( doc && doc.length ){
+  //     return res.status( 403 ).json({ message: 'Item already exists' });
+  //   }
+  //   else{
+  //   }
+  // });
 });
 
 router.put('/update-shop-item', authentication, async ( req, res ) => {
@@ -233,33 +255,41 @@ router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
   const month = date.toString().split(' ')[ 1 ];
   const year = date.toString().split(' ')[ 3 ];
 
-  Item.findById( id, (err, doc) => {
+  Item.findById( id, async (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
     if( !doc ) return res.sendStatus( 403 );
 
     doc.quantity--;
 
-    doc.save( err => {
-      if( err ) return res.sendStatus( 503 );
-
-      MonIncome.findOne({ year: year }, ( err, doc ) => {
+    try{
+      await Purchases.create({ name: doc.name, datePurchased: renderDate(new Date())});
+      
+      doc.save( err => {
         if( err ) return res.sendStatus( 503 );
 
-        if( doc ){
-          doc[ month.toLowerCase() ] += 1;
+        MonIncome.findOne({ year: year }, ( err, data ) => {
+          if( err ) return res.sendStatus( 503 );
 
-          doc.save( err => {
-            if( err ) return res.sendStatus( 503 );
+          if( data ){
+            data[ month.toLowerCase() ] += 1;
 
-            return res.sendStatus( 200 );
-          });
-        }
-        else{
-          res.end();
-        }
+            data.save( err => {
+              if( err ) return res.sendStatus( 503 );
+
+              return res.sendStatus( 200 );
+            });
+          }
+          else{
+            res.end();
+          }
+        });
       });
-    });
+    }
+    catch( err ){
+      throw err;
+      return res.sendStatus( 503 );
+    }
   });
 });
 
@@ -270,20 +300,6 @@ router.get('/export-record', async (req, res, next) => {
   const path_to_xls = path.join(__dirname, '../client/public/xls');
 
   const currentDate = new Date();
-  const renderDate = date => {
-    if( !date ) return '';
-
-    if( !(date instanceof Date) ){
-      date = new Date( date );
-    }
-
-    const _parsedDate = new Date( date );
-    const _date = _parsedDate.getDate();
-    const _month = _parsedDate.getMonth() + 1;
-    const _year = _parsedDate.getFullYear();
-
-    return `${_year}-${_month}-${_date}`;
-  }
 
   const fileName = `record_${ renderDate( currentDate ) }.xlsx`;
 
@@ -349,7 +365,6 @@ router.get('/monthly-income-report', authentication, async( req, res, next ) => 
 });
 
 
-
 router.get('/get-nonadmin-users', async( req, res ) => {
   User.find({ role: 'normal' }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
@@ -385,6 +400,22 @@ router.post('/add-user', async( req, res ) => {
     return res.json({ message: 'Added user successfully' });
   });
 });
+
+
+const renderDate = date => {
+  if( !date ) return '';
+
+  if( !(date instanceof Date) ){
+    date = new Date( date );
+  }
+
+  const _parsedDate = new Date( date );
+  const _date = _parsedDate.getDate();
+  const _month = _parsedDate.getMonth() + 1;
+  const _year = _parsedDate.getFullYear();
+
+  return `${_year}-${_month}-${_date}`;
+}
 
 
 module.exports = router;

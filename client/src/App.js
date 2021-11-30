@@ -14,6 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
+const PurchaseHistory = React.lazy(() => import('./views/purchaseHistory'));
 const Accounts = React.lazy(() => import('./views/accounts'));
 const Dashboard = React.lazy(() => import('./views/dashboard'));
 const Inventory = React.lazy(() => import('./views/inventory'));
@@ -29,7 +30,8 @@ const VIEWS = [
   `${ROOT}sign-in`,  // 2
   `${ROOT}inventory`,// 3
   `${ROOT}dashboard`, // 4
-  `${ROOT}account` // 5
+  `${ROOT}account`, // 5
+  `${ROOT}purchase-history`, // 5
 ];
 
 const validator = new Validator();
@@ -103,6 +105,10 @@ function App() {
           setToThisView( path.pathname );
           break;
 
+        case '/item-list':
+          setToThisView( path.pathname );
+          break;
+
         default:
           setToThisView( '/dashboard' );
           break;
@@ -151,6 +157,11 @@ function App() {
                       <Route exact path="/accounts">
                         <Appbar tools={tools}/>
                         <Accounts tools={tools}/>
+                      </Route>
+
+                      <Route exact path="/purchase-history">
+                        <Appbar tools={tools}/>
+                        <PurchaseHistory tools={tools}/>
                       </Route>
                     </>
                   )

@@ -3,6 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
 import uniqid from 'uniqid';
+import debounce from 'lodash.debounce';
 
 // import Link from '@mui/material/Link';
 import Menu from '@mui/material/Menu';
@@ -112,15 +113,21 @@ const Appbar = props => {
 		setToThisView
 	} = props.tools;
 
+	const path = window.location.pathname;
 	const [viewList, setViewList] = React.useState([{
 					title: 'Dashboard',
 					onClick: () => setToThisView('/dashboard')
 				},{
 					title: 'Inventory',
 					onClick: () => setToThisView('/inventory')
+				},
+				{
+					title: 'Purchase History',
+					onClick: () => setToThisView('/purchase-history')
 				}
 		]);
 
+	const [barTitle, setBarTitle] = React.useState('Dashboard');
 	const [drawer, setDrawer] = React.useState( false );
 	const [anchorEl, setAnchorEl] = React.useState( null );
 	const open = Boolean( anchorEl );
@@ -133,6 +140,22 @@ const Appbar = props => {
 
 	const handleClose = () => {
 		setAnchorEl( null );
+	}
+
+	const handleTitle = value => {
+		switch( path ){
+			case '/dashboard':
+				return 'Dashboard';
+
+			case '/inventory':
+				return 'Inventory';
+
+			case '/purchase-history':
+				return 'Purchase history';
+
+			case '/accounts':
+				return 'Accounts';
+		}
 	}
 
 	const handleSignOut = async () => {
@@ -185,7 +208,11 @@ const Appbar = props => {
 	    >
 			<List>
 				{viewList.map((item, index) => (
-					<ListItem key={uniqid()} button onClick={item.onClick}>
+					<ListItem 
+						key={uniqid()} 
+						button 
+						onClick={item.onClick}
+					>
 						<ListItemIcon>
 							<ArrowForwardIosIcon fontSize="small" />
 						</ListItemIcon>
@@ -209,7 +236,6 @@ const Appbar = props => {
 					onClick: () => setToThisView('/accounts')
 				});
 		}
-		console.log( role );
 	}, [role]);
 
 	return(
@@ -246,6 +272,9 @@ const Appbar = props => {
 	        >
 	          { list() }
 	      </Drawer>
+	      <div>
+		      <h5> { handleTitle() } </h5>
+	      </div>
 				{/*<Breadcrumbs
 					color="rgba(255, 255, 255, 0.8)"
 				>
