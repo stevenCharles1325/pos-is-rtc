@@ -172,7 +172,7 @@ const ItemList = props => {
 				backgroundColor:'#C0C0C0'
 			}}
 			className="d-flex flex-column justify-content-center align-items-center"
-		>
+		> 
 			{
 				windowWidth <= 620
 					? (

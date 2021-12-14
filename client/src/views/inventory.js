@@ -361,12 +361,14 @@ const Inventory = props => {
 		});	
 
 		let index = 0;
-		for( let i = 0; i < Math.floor(filtered.length / chunksLimit); i++ ){
-			const chunk = filtered.slice(index, chunksLimit);
-			chunkSet.push( chunk );
-			
+		do{
+			const chunk = filtered.slice(index, index + chunksLimit);
+
+			chunkSet.push( chunk );	
+
 			index += chunksLimit;
 		}
+		while( chunkSet.length !== Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0) ? 0 : 1 );
 
 		setRenderedItems([ ...chunkSet ]);
 	}
@@ -375,6 +377,14 @@ const Inventory = props => {
 
 	React.useEffect(() => memoizedFiltering(), [search, items]);
 	React.useEffect(() => getItems(), []);
+
+	React.useEffect(() => {
+		if( renderedItems.length ){
+			if( page === renderedItems.length && !renderedItems[ renderedItems.length - 1 ].length ){
+				setPage( page => page - 1 );
+			}
+		}
+	}, [renderedItems, page]);
 
 	return(
 		<div 
@@ -469,13 +479,12 @@ const Inventory = props => {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{ console.log( renderedItems ) }
 									{ renderedItems[ page - 1 ] }
 								</TableBody>
 							</Table>
 						</TableContainer>
 						<div style={{ width: '100%' }} className="my-2 d-flex flex-column justify-content-center align-items-center">
-							<Pagination count={ renderedItems.length } page={page} onChange={(_, value) => setPage( value )}/>
+							<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
 						</div>
 					</Stack>
 				</Paper>
