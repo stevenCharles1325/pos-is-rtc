@@ -14,7 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
-const PurchaseHistory = React.lazy(() => import('./views/purchaseHistory'));
+const ItemList = React.lazy(() => import('./views/itemList'));
 const Accounts = React.lazy(() => import('./views/accounts'));
 const Dashboard = React.lazy(() => import('./views/dashboard'));
 const Inventory = React.lazy(() => import('./views/inventory'));
@@ -31,7 +31,7 @@ const VIEWS = [
   `${ROOT}inventory`,// 3
   `${ROOT}dashboard`, // 4
   `${ROOT}account`, // 5
-  `${ROOT}purchase-history`, // 5
+  `${ROOT}item-list`, // 5
 ];
 
 const validator = new Validator();
@@ -159,9 +159,9 @@ function App() {
                         <Accounts tools={tools}/>
                       </Route>
 
-                      <Route exact path="/purchase-history">
+                      <Route exact path="/item-list">
                         <Appbar tools={tools}/>
-                        <PurchaseHistory tools={tools}/>
+                        <ItemList tools={tools}/>
                       </Route>
                     </>
                   )
@@ -185,6 +185,7 @@ function App() {
   );
 }
 
+
 const Loading = () => (
   <div 
     style={{ width: '100vw', height: '100vh' }} 
@@ -193,6 +194,7 @@ const Loading = () => (
     <CircularProgress/>
   </div>
 );
+
 
 function Path( pathname ){
   if( !pathname ) 

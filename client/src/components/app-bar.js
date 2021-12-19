@@ -122,8 +122,8 @@ const Appbar = props => {
 					onClick: () => setToThisView('/inventory')
 				},
 				{
-					title: 'Purchase History',
-					onClick: () => setToThisView('/purchase-history')
+					title: 'Item List',
+					onClick: () => setToThisView('/item-list')
 				}
 		]);
 
@@ -150,8 +150,8 @@ const Appbar = props => {
 			case '/inventory':
 				return 'Inventory';
 
-			case '/purchase-history':
-				return 'Purchase history';
+			case '/item-list':
+				return 'Item List';
 
 			case '/accounts':
 				return 'Accounts';
@@ -248,32 +248,70 @@ const Appbar = props => {
 			<Stack 
 				direction="row" 
 				spacing={2}
+				justifyContent={ windowWidth > 620 ? "space-between" : "space-around"}
+				alignItems='center'
 				sx={{ 
 					color: 'white',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between'
 				}}
 			>
-				<IconButton
-					size="large"
-					edge="start"
-					color="inherit"
-					aria-label="open drawer"
-					sx={{ mr: 2 }}
-					onClick={() => setDrawer( true )}
-				>
-					<MenuIcon />
-				</IconButton>
+				<div className="col-1">
+					<IconButton
+						size="large"
+						edge="start"
+						color="inherit"
+						aria-label="open drawer"
+						sx={{ mr: 2 }}
+						onClick={() => setDrawer( true )}
+					>
+						<MenuIcon />
+					</IconButton>
+				</div>
 				<Drawer
-	          anchor="left"
-	          open={drawer}
-	          onClose={toggleDrawer(false)}
-	        >
+          anchor="left"
+          open={drawer}
+          onClose={toggleDrawer(false)}
+        >
 	          { list() }
 	      </Drawer>
-	      <div>
-		      <h5> { handleTitle() } </h5>
+	      {
+	      	windowWidth > 450
+	      		? <div className="col-3">
+					      <h5 className="text-uppercase m-0 p-0" > rodmar telecom </h5>
+				      </div>
+				    : null
+	      }
+	      {
+					windowWidth > 620 && (window.location.pathname.includes('inventory') || window.location.pathname.includes('item-list'))
+						? (
+					      <div className="col-4">
+									<Search>
+					          <SearchIconWrapper>
+					            <SearchIcon />
+					          </SearchIconWrapper>
+					          <StyledInputBase
+					        		sx={{ width: '100%' }}
+						          value={search} 
+						          onChange={handleSearch}
+					            placeholder="Search item"
+					            inputProps={{ 'aria-label': 'search' }}
+					          />
+					        </Search>
+					      </div>
+							)
+						: null
+				}
+	      <div 
+	      	className="col-2 d-flex justify-content-end"
+	      >
+		      <h5 
+		      	className="p-2 m-0" 
+		      	style={{ 
+		      		border: '1px solid white',
+		      		width: 'fit-content'
+		      	}}
+		      > 
+		      		{ handleTitle() } 
+		      	</h5>
 	      </div>
 				{/*<Breadcrumbs
 					color="rgba(255, 255, 255, 0.8)"
@@ -303,30 +341,14 @@ const Appbar = props => {
 						</Typography>
 					</Link>
 				</Breadcrumbs>*/}
-				<Drawer
+				{/*<Drawer
           anchor="left"
           open={drawer}
           onClose={toggleDrawer(false)}
         >
             { list() }
-        </Drawer>
-				{
-					windowWidth > 620 && window.location.pathname.includes('inventory')
-						? (
-								<Search>
-				          <SearchIconWrapper>
-				            <SearchIcon />
-				          </SearchIconWrapper>
-				          <StyledInputBase
-					          value={search} 
-					          onChange={handleSearch}
-				            placeholder="Search item"
-				            inputProps={{ 'aria-label': 'search' }}
-				          />
-				        </Search>
-							)
-						: null
-				}
+        </Drawer>*/}
+				<div className="col-2">
 					<IconButton
 						size="large"
 						color="inherit"
@@ -355,6 +377,7 @@ const Appbar = props => {
 							</Menu>
 						</StyledBadge>
 					</IconButton>
+				</div>
 			</Stack>
 		</AppBar>
 	);

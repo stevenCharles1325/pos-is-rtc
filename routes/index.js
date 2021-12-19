@@ -11,8 +11,7 @@ var User = require('../models/users');
 var Item = require('../models/items');
 var Token = require('../models/tokens');
 var MonIncome = require('../models/monthlyIncome');
-var Purchases = require('../models/purchases');
-var Delivers = require('../models/delivers');
+var ItemList = require('../models/itemList');
 
 
 const requestAccessToken = ( user ) => {
@@ -165,28 +164,25 @@ router.post('/auth/refresh-token', async ( req, res ) => {
 
 
 // =============== Regular routes ===============
+router.delete('/item-list-delete', authentication, async( req, res ) => {
+  ItemList.delete({}, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ) return res.json( doc );
+  });
+});
+
+router.get('/item-list', authentication, async( req, res ) => {
+  ItemList.find({}, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ) return res.json( doc );
+  });
+});
+
 
 router.get('/shop-items', authentication, async ( req, res ) => {
   Item.find({}, (err, doc) => {
-    if( err ) return res.sendStatus( 503 );
-
-    return res.json({ items: doc, message: 'Successfully fetched all items' });
-  });
-});
-
-
-router.get('/purchase-history', async ( req, res ) => {
-  Purchases.find({}, (err, docs) => {
-    if( err ) return res.sendStatus( 503 );
-
-    console.log( docs );
-    return res.json({ items: docs, message: 'Successfully fetched all items' });
-  });
-});
-
-
-router.get('/deliver-history', async ( req, res ) => {
-  Delivers.find({}, (err, docs) => {
     if( err ) return res.sendStatus( 503 );
 
     return res.json({ items: doc, message: 'Successfully fetched all items' });
@@ -263,8 +259,6 @@ router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
     doc.quantity--;
 
     try{
-      await Purchases.create({ name: doc.name, datePurchased: renderDate(new Date())});
-      
       doc.save( err => {
         if( err ) return res.sendStatus( 503 );
 

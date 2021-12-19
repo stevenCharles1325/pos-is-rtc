@@ -121,21 +121,24 @@ const Item = props => {
 		}
 	}
 
-	React.useEffect(() => {
-		if( count === 0 ){
-			enqueueSnackbar(`${props.name} has been sold out`, { variant: 'success' });
-		}	
-	}, [count]);
+	// React.useEffect(() => {
+	// 	if( count === 0 ){
+	// 		enqueueSnackbar(`${props.name} has been sold out`, { variant: 'success' });
+	// 	}	
+	// 	else{
+
+	// 	}
+	// }, [count]);
 
 	return(
 		<TableRow sx={{ paddingTop: '5px', paddingBottom: '5px' }}>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.name } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { count } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.srp } </TableCell>
-			{/*<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>*/}
-			<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>
+			<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>
+			{/*<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>*/}
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="center">
-				{/*<IconButton 
+				<IconButton 
 					onClick={() => {
 						setSelectedItem({
 							_id: props._id,
@@ -149,18 +152,12 @@ const Item = props => {
 						handleEditBox();
 					}}
 				>
-					<#2ed573
+					<EditIcon/>
+				</IconButton>
+				
+				{/*<IconButton onClick={() => handleBuy()}>
+					<ShoppingCartIcon/>
 				</IconButton>*/}
-
-				{
-					count > 0
-						? <IconButton onClick={() => handleBuy()}>
-								<ShoppingCartIcon/>
-							</IconButton>
-						: <IconButton disabled>
-								<RemoveShoppingCartIcon sx={{ color: 'red' }}/>
-							</IconButton> 
-				}
 
 				{/*<IconButton onClick={() => handleDelete( props._id )}>
 					<DeleteIcon/>
@@ -169,7 +166,7 @@ const Item = props => {
 			<TableCell 
 				sx={{ 
 					paddingTop: '5px', 
-					paddingBottom: '5px',
+					paddingBottom: '5px', 
 					color: count === 0 ? '#ff4757' : '#2ed573'
 				}} 
 				align="center"
@@ -492,8 +489,8 @@ const Inventory = props => {
 										<TableCell><b>Item name</b></TableCell>
 				            <TableCell align="right"><b>Quantity</b></TableCell>
 				            <TableCell align="right"><b>Price</b></TableCell>
-				            {/*<TableCell align="right"><b>Date delivered</b></TableCell>*/}
-				            <TableCell align="right"><b>Date released</b></TableCell>
+				            <TableCell align="right"><b>Date delivered</b></TableCell>
+				            {/*<TableCell align="right"><b>Date released</b></TableCell>*/}
 				            <TableCell align="center"><b>Action</b></TableCell>
 				            <TableCell align="center"><b>State</b></TableCell>
 									</TableRow>
@@ -509,7 +506,7 @@ const Inventory = props => {
 					</Stack>
 				</Paper>
 			</div>
-			{/*<SpeedDial
+			<SpeedDial
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}
         icon={<SpeedDialIcon />}
@@ -524,8 +521,8 @@ const Inventory = props => {
 		          />
 		        ))
 	    }
-    	</SpeedDial>*/}
-    	{/*<AddItemBox 
+    	</SpeedDial>
+    	<AddItemBox 
     		update={getItems}
       	addItem={addItem}
     		fullScreen={fullScreen} 
@@ -539,7 +536,7 @@ const Inventory = props => {
     		openEditBox={openEditBox} 
     		selectedItem={selectedItem}
     		handleEditBox={handleEditBox}
-    	/> */}
+    	/> 
 		</div>
 	);
 }
@@ -553,14 +550,15 @@ const AddItemBox = props => {
 		update
 	} = props;
 
+	let today = new Date().toISOString().split('T')[0];
 	const { enqueueSnackbar } = useSnackbar();
 
 	const [item, setItem] = React.useState({
 		name: '',
 		quantity: 0,
 		srp: 0,
-		dateDelivered: '',
-		dateReleased: ''
+		dateDelivered: today,
+		dateReleased: today
 	});
 
 	const handleName = e => {
@@ -645,9 +643,23 @@ const AddItemBox = props => {
           <TextField onChange={handleName} autoFocus variant="filled" label="Item name"/>
           <TextField onChange={handleCount} variant="filled" type="number" label="Item quantity"/>
           <TextField onChange={handleSrp} variant="filled" type="number" label="Item price"/>
-          <TextField onChange={handleDateDelivered} variant="standard" type='date' helperText="Date delivered"/>
-          <TextField onChange={handleDateReleased} variant="standard" type='date' helperText="Date released"/>
-      </Stack>
+          <TextField 
+          	onChange={handleDateDelivered} 
+          	onClick={ e => e.target.setAttribute('min', today)}
+          	defaultValue={today} 
+          	variant="standard" 
+          	type='date' 
+          	helperText="Date delivered"
+          />
+          <TextField 
+          	onChange={handleDateReleased} 
+          	onClick={ e => e.target.setAttribute('min', today)}
+          	defaultValue={today} 
+          	variant="standard" 
+          	type='date' 
+          	helperText="Date released"
+          />
+	      </Stack>
       </DialogContent>
       
       <DialogActions>

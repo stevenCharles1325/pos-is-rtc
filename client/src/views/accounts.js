@@ -61,7 +61,12 @@ const Item = props => {
 								editMode: true,
 								_id: props._id,
 								username: props.username,
-								password: props.password
+								password: props.password,
+								firstName: props.firstName,
+								middleName: props.middleName,
+								lastName: props.lastName,
+								email: props.email,
+								number: props.number,
 							});
 
 							handleItemBox();
@@ -211,16 +216,20 @@ const Accounts = props => {
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<ItemBox 
-				addItem={handleAdd}
-	    		editItem={updateItem}
-	    		fullScreen={fullScreen} 
-	    		openItemBox={openItemBox} 
-	    		selectedItem={selectedItem}
-	    		handleItemBox={handleItemBox}
-	    		setSelectedItem={setSelectedItem}
-	    		update={handleFetchNonAdminAccounts}
-	    	/> 
+			{ 
+				selectedItem || openItemBox
+					? <ItemBox 
+						addItem={handleAdd}
+			    		editItem={updateItem}
+			    		fullScreen={fullScreen} 
+			    		openItemBox={openItemBox} 
+			    		selectedItem={selectedItem}
+			    		handleItemBox={handleItemBox}
+			    		setSelectedItem={setSelectedItem}
+			    		update={handleFetchNonAdminAccounts}
+			    	/>  
+			    	: null
+			}
 			<div style={{ position: 'absolute', bottom: '2vh', right: '2vw'}}>
 				<IconButton onClick={handleItemBox}>
 					<AddBoxIcon fontSize="large"/>
@@ -244,34 +253,75 @@ const ItemBox = props => {
 
 	const { enqueueSnackbar } = useSnackbar();
 
-	const [item, setItem] = React.useState({
+	const userObject = {
 		_id: selectedItem?._id ?? '',
 		username: selectedItem?.username ?? '',
-		password: selectedItem?.password ?? ''
-	});
-
-	const handleUsername = e => {
-		setItem( item => ({
-			_id: item._id,
-			username: e.target.value,
-			password: item.password
-		}));
+		password: selectedItem?.password ?? '',
+		firstName: selectedItem?.firstName ?? '',
+		lastName: selectedItem?.lastName ?? '',
+		middleName: selectedItem?.middleName ?? '',
+		email: selectedItem?.email ?? '',
+		number: selectedItem?.number ?? '',
 	}
 
-	const handlePassword = e => {
-		setItem( item => ({
-			_id: item._id,
-			username: item.username,
-			password: e.target.value
-		}));
+	const reducer = (state, action) => {
+		switch( action.type ){
+			case 'username':
+				state.username = action.data;
+				return state;
+
+			case 'password':
+				state.password = action.data;
+				return state;
+
+			case 'firstName':
+				state.firstName = action.data;
+				return state;
+
+			case 'middleName':
+				state.middleName = action.data;
+				return state;
+
+			case 'lastName':
+				state.lastName = action.data;
+				return state;
+
+			case 'email':
+				state.email = action.data;
+				return state;
+
+			case 'number':
+				state.number = action.data;
+				return state;
+
+			default:
+				return state;			
+		}
 	}
+
+	const [item, dispatch] = React.useReducer(reducer, userObject);
 
 	React.useEffect(() => {
 		if( props?.selectedItem ){
-			setItem(() => ({ ...props.selectedItem }));
+			const data = props?.selectedItem;
+
+			console.log( data );
+			dispatch({ type: 'username', data: data.username });
+			dispatch({ type: 'password', data: data.password });
+			dispatch({ type: 'firstName', data: data.firstName });
+			dispatch({ type: 'middleName', data: data.middleName });
+			dispatch({ type: 'lastName', data: data.lastName });
+			dispatch({ type: 'email', data: data.email });
+			dispatch({ type: 'number', data: data.number });
 		}
 		else{
-			setItem(() => ({ _id: '', username: '', password: '' }));
+			dispatch({ type: 'username', data: '' });
+			dispatch({ type: 'password', data: '' });
+			dispatch({ type: 'firstName', data: '' });
+			dispatch({ type: 'middleName', data: '' });
+			dispatch({ type: 'lastName', data: '' });
+			dispatch({ type: 'email', data: '' });
+			dispatch({ type: 'number', data: '' });
 		}
 
 	}, [props]);
@@ -290,21 +340,62 @@ const ItemBox = props => {
 	        </DialogTitle>
 	        <DialogContent>
 	          <DialogContentText>
-	            Please do not leave a blank field
+	            Please do not leave username and password field blank.
 	          </DialogContentText>
 
 	          <Stack spacing={5}>
 		          <TextField 
-		          	onChange={handleUsername} 
-		          	value={item.username} 
+		          	onChange={e => dispatch({ type: 'firstName', data: e.target.value })} 
+		          	defaultValue={item.firstName} 
+		          	autoFocus 
+		          	variant="filled" 
+		          	label="First Name"
+		          />
+		          
+		          <TextField 
+		          	onChange={e => dispatch({ type: 'middleName', data: e.target.value })} 
+		          	defaultValue={item.middleName} 
+		          	autoFocus 
+		          	variant="filled" 
+		          	label="Middle Name"
+		          />
+		          
+		          <TextField 
+		          	onChange={e => dispatch({ type: 'lastName', data: e.target.value })} 
+		          	defaultValue={item.lastName} 
+		          	autoFocus 
+		          	variant="filled" 
+		          	label="Last Name"
+		          />
+
+  		          <TextField 
+		          	onChange={e => dispatch({ type: 'email', data: e.target.value })} 
+		          	defaultValue={item.email} 
+		          	autoFocus 
+		          	type="email"
+		          	variant="filled" 
+		          	label="Email"
+		          />
+
+  		          <TextField 
+		          	onChange={e => dispatch({ type: 'number', data: e.target.value })} 
+		          	defaultValue={item.number} 
+		          	autoFocus 
+		          	variant="filled" 
+		          	label="Contact Number"
+		          />
+
+		          <TextField 
+		          	onChange={e => dispatch({ type: 'username', data: e.target.value })} 
+		          	defaultValue={item.username} 
 		          	autoFocus 
 		          	variant="filled" 
 		          	label="Username"
 		          />
 		         
 		          <TextField 
-		          	onChange={handlePassword} 
-		          	value={item.password} 
+		          	onChange={e => dispatch({ type: 'password', data: e.target.value })} 
+		          	defaultValue={item.password} 
 		          	autoFocus 
 		          	variant="filled" 
 		          	label="Password"
@@ -326,7 +417,8 @@ const ItemBox = props => {
 	          		? (
 						<Button 
 				          	onClick={() => {
-				          		if( !item.username || !item.password ) return enqueueSnackbar('All fields are required', { variant: 'error' });
+				          		if( !item.username || !item.password ) 
+				          			return enqueueSnackbar('Username and Password are required', { variant: 'error' });
 				          		
 				          		handleItemBox();
 				          		editItem( item );
@@ -339,12 +431,29 @@ const ItemBox = props => {
           			: (
           				<Button 
 				          	onClick={() => {
-				          		if( !item.username || !item.password ) return enqueueSnackbar('All fields are required', { variant: 'error' });
+				          		if( !item.username || !item.password ) 
+				          			return enqueueSnackbar('Username and Password are required', { variant: 'error' });
 				          		
-				          		const { username, password } = item;
+				          		const { 
+				          			username,
+				          			password,
+				          			firstName,
+				          			middleName,
+				          			lastName,
+				          			email,
+				          			number 
+				          		} = item;
 
 				          		handleItemBox();
-				          		addItem({ username, password });
+				          		addItem({
+				          			username,
+				          			password,
+				          			firstName,
+				          			middleName,
+				          			lastName,
+				          			email,
+				          			number
+				          		});
 				          	}} 
 				          	autoFocus
 				        >
