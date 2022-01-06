@@ -55,7 +55,7 @@ const Signin = props => {
 	};
 
 	const signIn = async () => {
-		axios.post(`http://${window.address}:${window.port}/sign-in`, user)
+		axios.post(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/sign-in`, user)
 		.then( res => {
 			const { accessToken, refreshToken } = res.data;
 

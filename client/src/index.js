@@ -4,9 +4,6 @@ import './styles/index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-window.port = '3500';
-window.address = '192.168.1.3';
-
 ReactDOM.render(
   <React.StrictMode>
     <Router basename="/">

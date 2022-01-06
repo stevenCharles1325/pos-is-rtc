@@ -220,7 +220,7 @@ const Inventory = props => {
 	const getItems = async () => {
 		const token = Cookies.get('token');
 
-		axios.get(`http://${window.address}:${window.port}/shop-items`, {
+		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/shop-items`, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -241,7 +241,7 @@ const Inventory = props => {
 
 		const token = Cookies.get('token');
 
-		axios.post(`http://${window.address}:${window.port}/add-shop-item`, { item }, {
+		axios.post(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/add-shop-item`, { item }, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -263,7 +263,7 @@ const Inventory = props => {
 
 		const token = Cookies.get('token');
 
-		axios.put(`http://${window.address}:${window.port}/update-shop-item`, item, {
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/update-shop-item`, item, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -283,7 +283,7 @@ const Inventory = props => {
 		const ItemRemoval = async id => {
 			const token = Cookies.get('token');
 
-			axios.delete(`http://${window.address}:${window.port}/delete-shop-item/${ id }`, {
+			axios.delete(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/delete-shop-item/${ id }`, {
 				headers: {
 					'authentication': `Bearer ${ token }`
 				}
@@ -305,7 +305,7 @@ const Inventory = props => {
 	const buyItem = async ([id, name]) => {
 		const token = Cookies.get('token');
 
-		axios.put(`http://${window.address}:${window.port}/buy-shop-item/${id}`, null, {
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/buy-shop-item/${id}`, null, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -325,7 +325,7 @@ const Inventory = props => {
 	const handleExport = async () => {
 		const token = Cookies.get('token');
 
-		axios.get(`http://${window.address}:${window.port}/export-record`, {
+		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/export-record`, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}

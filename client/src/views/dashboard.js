@@ -65,7 +65,7 @@ const Dashboard = props => {
 		const getGrapData = async () => {
 			const token = Cookies.get('token');
 
-			axios.get(`http://${window.address}:${window.port}/monthly-income-report`, {
+			axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/monthly-income-report`, {
 				headers: {
 					'authentication': `Bearer ${ token }`
 				}

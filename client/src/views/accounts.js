@@ -100,7 +100,7 @@ const Accounts = props => {
 	}
 
 	const handleFetchNonAdminAccounts = async () => {
-		axios.get(`http://${window.address}:${window.port}/get-nonadmin-users`)
+		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/get-nonadmin-users`)
 		.then( res => {
 			setAccounts([ ...res.data ]);
 		})
@@ -113,7 +113,7 @@ const Accounts = props => {
 	const updateItem = async item => {
 		const token = Cookies.get('token');
 
-		axios.put(`http://${window.address}:${window.port}/update-user/${item._id}`, item, {
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/update-user/${item._id}`, item, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -131,7 +131,7 @@ const Accounts = props => {
 	const handleAdd = async item => {
 		const token = Cookies.get('token');
 
-		axios.post(`http://${window.address}:${window.port}/add-user`, item, {
+		axios.post(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/add-user`, item, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -149,7 +149,7 @@ const Accounts = props => {
 	const handleDelete = async id => {
 		const token = Cookies.get('token');
 
-		axios.delete(`http://${window.address}:${window.port}/delete-user/${id}`, {
+		axios.delete(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/delete-user/${id}`, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
