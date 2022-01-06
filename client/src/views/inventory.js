@@ -373,11 +373,14 @@ const Inventory = props => {
 			));
 		}
 
-		items.forEach( item => {
+		const sortedItems = [ ...items ];
+		sortedItems.sort((item1, item2) => new Date( item1.dateDelivered ) - new Date( item2.dateDelivered ));	
+
+		sortedItems.reverse().forEach( item => {
 			if(item.name.toLowerCase().includes( search.toLowerCase() )){
 				addToFilteredItems( item );
 			}
-		});	
+		});
 
 		let index = 0;
 		do{
@@ -495,7 +498,7 @@ const Inventory = props => {
 				            {/*<TableCell align="right"><b>Date delivered</b></TableCell>*/}
 				            <TableCell align="right"><b>Date released</b></TableCell>
 				            <TableCell align="center"><b>Action</b></TableCell>
-				            <TableCell align="center"><b>State</b></TableCell>
+				            <TableCell align="center"><b>Status</b></TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
@@ -503,12 +506,28 @@ const Inventory = props => {
 								</TableBody>
 							</Table>
 						</TableContainer>
-						<div style={{ width: '100%' }} className="my-2 d-flex flex-column justify-content-center align-items-center">
-							<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
+							<div className="col-2 d-flex flex-row" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>
+								<b className="p-0 m-0">Total item: </b><p className="p-0 m-0"> { items.length }</p>
+							</div>
+							<div className="col-10 d-flex justify-content-center align-items-center">
+								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+							</div>
 						</div>
 					</Stack>
 				</Paper>
 			</div>
+			{/*<div
+				style={{
+					position: 'absolute',
+					bottom: '3%',
+					right: '3%'
+				}}
+			>
+				<IconButton sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+					<AddIcon/>
+				</IconButton>
+			</div>*/}
 			{/*<SpeedDial
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}

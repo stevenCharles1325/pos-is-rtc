@@ -245,7 +245,7 @@ const Inventory = props => {
 		})
 		.then( res => {
 			enqueueSnackbar( res.data.message, { variant: 'success' });			
-			setItems( items => [ ...items, res.data.item ]);
+			// setItems( items => [ ...items, res.data.item ]);
 		})
 		.catch( err => {
 			if( err?.response?.status === 403 ){
@@ -267,9 +267,10 @@ const Inventory = props => {
 		})
 		.then( res => { 
 			enqueueSnackbar( res.data.message, { variant: 'success' });					
-			setItems(() => [ ...res.data.items ]);
+			// setItems(() => [ ...res.data.items ]);
 		})
 		.catch( err => {
+			enqueueSnackbar( err?.response?.data?.message ?? 'Error occured, please try again!', { variant: 'error' });					
 			errorHandler.handle( err, updateItem, 5, null, item );
 		});
 	}
@@ -370,11 +371,14 @@ const Inventory = props => {
 			));
 		}
 
-		items.forEach( item => {
+		const sortedItems = [ ...items ];
+		sortedItems.sort((item1, item2) => new Date( item1.dateDelivered ) - new Date( item2.dateDelivered ));	
+
+		sortedItems.reverse().forEach( item => {
 			if(item.name.toLowerCase().includes( search.toLowerCase() )){
 				addToFilteredItems( item );
 			}
-		});	
+		});
 
 		let index = 0;
 		do{
@@ -492,7 +496,7 @@ const Inventory = props => {
 				            <TableCell align="right"><b>Date delivered</b></TableCell>
 				            {/*<TableCell align="right"><b>Date released</b></TableCell>*/}
 				            <TableCell align="center"><b>Action</b></TableCell>
-				            <TableCell align="center"><b>State</b></TableCell>
+				            <TableCell align="center"><b>Status</b></TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
@@ -500,8 +504,13 @@ const Inventory = props => {
 								</TableBody>
 							</Table>
 						</TableContainer>
-						<div style={{ width: '100%' }} className="my-2 d-flex flex-column justify-content-center align-items-center">
-							<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
+							<div className="col-2 d-flex flex-row" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>
+								<b className="p-0 m-0">Total item: </b><p className="p-0 m-0"> { items.length }</p>
+							</div>
+							<div className="col-10 d-flex justify-content-center align-items-center">
+								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+							</div>
 						</div>
 					</Stack>
 				</Paper>
@@ -522,7 +531,7 @@ const Inventory = props => {
 		        ))
 	    }
     	</SpeedDial>
-    	<AddItemBox 
+    	<AddItemBox
     		update={getItems}
       	addItem={addItem}
     		fullScreen={fullScreen} 
@@ -825,6 +834,7 @@ const EditItemBox = props => {
 		          />
 		          
 		          <TextField 
+		          	disabled
 		          	onChange={handleSrp} 
 		          	defaultValue={selectedItem?.srp} 
 		          	variant="filled" 
