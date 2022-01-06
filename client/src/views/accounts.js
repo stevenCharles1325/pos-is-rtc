@@ -33,6 +33,13 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useSnackbar } from 'notistack';
 
+import FilledInput from '@mui/material/FilledInput';
+import Input from '@mui/material/Input';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 const Item = props => {
 	const {
@@ -47,8 +54,9 @@ const Item = props => {
 
 	return(
 		<TableRow>
+			<TableCell component="th" scope="row"> { props.firstName } </TableCell>
+			<TableCell component="th" scope="row"> { props.lastName } </TableCell>
 			<TableCell component="th" scope="row"> { props.username } </TableCell>
-			<TableCell align="center"> { props.password } </TableCell>
 			<TableCell align="center">
 				<Stack
 					direction="row"
@@ -202,12 +210,13 @@ const Accounts = props => {
 
 	return(
 		<div style={{ width: '100%', height: '100%', padding: '100px 10px 10px 10px' }} className="d-flex justify-content-center align-items-start">
-			<TableContainer component={Paper} sx={{ width: 700 }}>
+			<TableContainer component={Paper} sx={{ width: 900 }}>
 				<Table>
 					<TableHead>
 						<TableRow>
+							<TableCell><b>First Name</b></TableCell>
+							<TableCell><b>Last Name</b></TableCell>
 							<TableCell><b>Username</b></TableCell>
-				            <TableCell align="center"><b>Password</b></TableCell>
 				            <TableCell align="center"><b> Actions </b></TableCell>
 						</TableRow>
 					</TableHead>
@@ -264,6 +273,16 @@ const ItemBox = props => {
 		number: selectedItem?.number ?? '',
 	}
 
+	const [user, setUser] = React.useState({ password: '', showPassword: false });
+
+	const handleClickShowPassword = () => {
+		setShowPassword( showPassword => !showPassword );
+	};
+
+	const handleMouseDownPassword = event => {
+		event.preventDefault();
+	};
+
 	const reducer = (state, action) => {
 		switch( action.type ){
 			case 'username':
@@ -300,6 +319,7 @@ const ItemBox = props => {
 	}
 
 	const [item, dispatch] = React.useReducer(reducer, userObject);
+	const [showPassword, setShowPassword] = React.useState( false );
 
 	React.useEffect(() => {
 		if( props?.selectedItem ){
@@ -393,13 +413,28 @@ const ItemBox = props => {
 		          	label="Username"
 		          />
 		         
-		          <TextField 
-		          	onChange={e => dispatch({ type: 'password', data: e.target.value })} 
-		          	defaultValue={item.password} 
-		          	autoFocus 
-		          	variant="filled" 
-		          	label="Password"
-		          />
+		          <FormControl sx={{ m: 1, width: '100%' }} variant="filled">
+					<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
+					<FilledInput 
+						id="sign-in-pass" 
+						variant="filled" 
+						type={ showPassword ? "text" : "password" }
+						value={ item.password } 
+						onChange={e => dispatch({ type: 'password', data: e.target.value })} 
+						endAdornment={
+			              <InputAdornment position="end">
+			                <IconButton
+			                  aria-label="toggle password visibility"
+			                  onClick={handleClickShowPassword}
+			                  onMouseDown={handleMouseDownPassword}
+			                  edge="end"
+			                >
+			                  { showPassword ? <VisibilityOff /> : <Visibility /> }
+			                </IconButton>
+			              </InputAdornment>
+			            }
+					/>
+				</FormControl>
 		      </Stack>
 	        </DialogContent>
 	        

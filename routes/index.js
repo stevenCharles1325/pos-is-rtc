@@ -172,6 +172,7 @@ router.delete('/item-list-delete', authentication, async( req, res ) => {
   });
 });
 
+
 router.get('/item-list', authentication, async( req, res ) => {
   ItemList.find({}, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
@@ -193,21 +194,28 @@ router.get('/shop-items', authentication, async ( req, res ) => {
 router.post('/add-shop-item', authentication, async ( req, res ) => {
   const { item } = req.body;
 
-  Item.create({ ...item }, (err, doc) => {
-    if( err ) return res.sendStatus( 503 );
-
-    return res.status( 200 ).json({ item: doc, message: 'Successfully added an items' });
-  });
-  // Item.find({ name: item.name }, (err, doc) => {
+  // Item.create({ ...item }, (err, doc) => {
   //   if( err ) return res.sendStatus( 503 );
 
-  //   if( doc && doc.length ){
-  //     return res.status( 403 ).json({ message: 'Item already exists' });
-  //   }
-  //   else{
-  //   }
+  //   return res.status( 200 ).json({ item: doc, message: 'Successfully added an items' });
   // });
+
+  Item.find({ name: item.name }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc && doc.length ){
+      return res.status( 403 ).json({ message: 'Item already exists' });
+    }
+    else{
+      Item.create({ ...item }, (err, doc) => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.status( 200 ).json({ item: doc, message: 'Successfully added an items' });
+      });
+    }
+  });
 });
+
 
 router.put('/update-shop-item', authentication, async ( req, res ) => {
   const { 
@@ -219,14 +227,24 @@ router.put('/update-shop-item', authentication, async ( req, res ) => {
     dateReleased
   } = req.body;
 
-  Item.findByIdAndUpdate( _id, { name, quantity, srp, dateDelivered, dateReleased }, (err, doc) => {
+  Item.findOne({ name }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    Item.find({}, (err, doc) => {
-      if( err ) return res.sendStatus( 503 );
+    if( doc ){
+      return res.status( 403 ).json({ message: 'Item already exists' });
+    }
+    else{
+      Item.findByIdAndUpdate( _id, { name, quantity, srp, dateDelivered, dateReleased }, (err, doc) => {
+        if( err ) return res.sendStatus( 503 );
 
-      return res.json({ items: doc, message: `Updated ${name} succcessfully!` });
-    });
+
+        Item.find({}, (err, doc) => {
+          if( err ) return res.sendStatus( 503 );
+
+          return res.json({ items: doc, message: `Updated ${name} succcessfully!` });
+        });
+      });
+    }
   });
 });
 
