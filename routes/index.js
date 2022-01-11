@@ -200,7 +200,7 @@ router.post('/add-shop-item', authentication, async ( req, res ) => {
   //   return res.status( 200 ).json({ item: doc, message: 'Successfully added an items' });
   // });
 
-  Item.find({ name: item.name }, (err, doc) => {
+  Item.find({ name: item.name.toLowerCase() }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
     if( doc && doc.length ){
@@ -227,7 +227,7 @@ router.put('/update-shop-item', authentication, async ( req, res ) => {
     dateReleased
   } = req.body;
 
-  Item.findOne({ name }, (err, doc) => {
+  Item.findOne({ name: name.toLowerCase() }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
     if( doc ){

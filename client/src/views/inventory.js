@@ -31,6 +31,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DialogTitle from '@mui/material/DialogTitle';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import Autocomplete from '@mui/material/Autocomplete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -196,11 +197,14 @@ const Inventory = props => {
 	const [openAddBox, setOpenAddBox] = React.useState( false );
 	const [openEditBox, setOpenEditBox] = React.useState( false );
 
-	const [items, setItems] = React.useState( [] );
+	const [items, setItems] = React.useState( [] ); // accumulator of items
 	const [message, setMessage] = React.useState( null );
-	const [renderedItems, setRenderedItems] = React.useState( [] );
-	const [filteredItems, setFilteredItems] = React.useState( null );
+	const [renderedItems, setRenderedItems] = React.useState( [] ); // Row
+	const [filteredItems, setFilteredItems] = React.useState( null ); // Search filtered items
 	const [selectedItem, setSelectedItem] = React.useState( null );
+
+	const [options, setOptions] = React.useState([]);
+	const [dropDown, setDropDown] = React.useState( false );
 
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -401,6 +405,17 @@ const Inventory = props => {
 	React.useEffect(() => getItems(), []);
 
 	React.useEffect(() => {
+		if( items.lenght ){
+			const tempOptions = [];
+			items.forEach( item => {
+				tempOptions.push({ name: item.name, dateDelivered: item.dateDelivered });
+			});
+
+			setOptions([ ...tempOptions ]);
+		}
+	}, [items]);
+
+	React.useEffect(() => {
 		if( renderedItems.length ){
 			if( page === renderedItems.length && !renderedItems[ renderedItems.length - 1 ].length ){
 				setPage( page => page - 1 );
@@ -517,7 +532,7 @@ const Inventory = props => {
 					</Stack>
 				</Paper>
 			</div>
-			{/*<div
+			<div
 				style={{
 					position: 'absolute',
 					bottom: '3%',
@@ -527,7 +542,10 @@ const Inventory = props => {
 				<IconButton sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
 					<AddIcon/>
 				</IconButton>
-			</div>*/}
+			</div>
+			<DropDownDialog
+
+			/>
 			{/*<SpeedDial
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}
@@ -560,6 +578,64 @@ const Inventory = props => {
     		handleEditBox={handleEditBox}
     	/> */}
 		</div>
+	);
+}
+
+
+const DropDownDialog = props => {
+	const [currentSelected, setCurrentSelected] = React.useState( [] );
+
+	React.useEffect(() => {
+		const selectedData = Cookies.get('selectedData');
+
+		if( selectedData ){
+			setCurrentSelected([ ...selectedData ]);
+		}
+	}, []);
+
+	return(
+		<Dialog onClose={props.handleClose} open={props.open}>
+      <DialogTitle>Choose Model</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+         	Select MyPhone model and their date delivered.
+        </DialogContentText>
+          <Autocomplete
+			      id="model-select"
+			      sx={{ width: '100%' }}
+			      onChange={(_, value) => {
+			      	const selectedData = Cookies.get('selectedData');
+			      	selectedData.push( value );
+			      	Cookies.set('selectedData', selectedData);
+
+			      	// set value
+			      	setCurrentSelected( currentSelected => [ ...currentSelected, value ]);
+			      }}
+			      options={props.options}
+			      autoHighlight
+			      getOptionLabel={(option) => `${option.name} - ${renderDate( option.dateDelivered )}`}
+			      renderOption={(props, option) => (
+			        <Box component="li" {...props}>
+			          {`${option.name} - ${renderDate( option.dateDelivered )}`}
+			        </Box>
+			      )}
+			      renderInput={(params) => (
+			        <TextField
+			          {...params}
+			          label="Choose a model or date delivered"
+			          inputProps={{
+			            ...params.inputProps,
+			            autoComplete: 'new-password', // disable autocomplete and autofill
+			          }}
+			        />
+			      )}
+			    />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={props.handleClose}>Cancel</Button>
+          <Button onClick={props.handleSelect}>Select</Button>
+        </DialogActions>
+    </Dialog>
 	);
 }
 
