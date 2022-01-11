@@ -227,23 +227,30 @@ router.put('/update-shop-item', authentication, async ( req, res ) => {
     dateReleased
   } = req.body;
 
+  if( !_id ) return res.status( 403 ).json({ message: 'Error occured, please try again!' });
+
   Item.findOne({ name: name.toLowerCase() }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    if( doc ){
+    if( doc && doc._id.toString() !== _id ){
       return res.status( 403 ).json({ message: 'Item already exists' });
     }
     else{
-      Item.findByIdAndUpdate( _id, { name, quantity, srp, dateDelivered, dateReleased }, (err, doc) => {
+      Item.updateOne({ _id: _id }, { name, quantity, srp, dateDelivered, dateReleased }, err => {
         if( err ) return res.sendStatus( 503 );
 
-
-        Item.find({}, (err, doc) => {
-          if( err ) return res.sendStatus( 503 );
-
-          return res.json({ items: doc, message: `Updated ${name} succcessfully!` });
-        });
+        return res.json({ message: `Updated ${name} succcessfully!` });
       });
+      // Item.findByIdAndUpdate( _id, { name, quantity, srp, dateDelivered, dateReleased }, (err, doc) => {
+      //   if( err ) return res.sendStatus( 503 );
+
+
+      //   Item.find({}, (err, doc) => {
+      //     if( err ) return res.sendStatus( 503 );
+
+      //     return res.json({ items: doc, message: `Updated ${name} succcessfully!` });
+      //   });
+      // });
     }
   });
 });

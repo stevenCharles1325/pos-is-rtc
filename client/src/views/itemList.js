@@ -135,7 +135,7 @@ const Item = props => {
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.name } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { count } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.srp } </TableCell>
-			<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>
+			{/*<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>*/}
 			{/*<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>*/}
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="center">
 				<IconButton 
@@ -246,6 +246,7 @@ const Inventory = props => {
 		.then( res => {
 			enqueueSnackbar( res.data.message, { variant: 'success' });			
 			// setItems( items => [ ...items, res.data.item ]);
+			getItems();
 		})
 		.catch( err => {
 			if( err?.response?.status === 403 ){
@@ -268,6 +269,7 @@ const Inventory = props => {
 		.then( res => { 
 			enqueueSnackbar( res.data.message, { variant: 'success' });					
 			// setItems(() => [ ...res.data.items ]);
+			getItems();
 		})
 		.catch( err => {
 			enqueueSnackbar( err?.response?.data?.message ?? 'Error occured, please try again!', { variant: 'error' });					
@@ -393,9 +395,9 @@ const Inventory = props => {
 		setRenderedItems([ ...chunkSet ]);
 	}
 
-	const memoizedFiltering = React.useCallback(() => handleSearching(), [search, items]);
+	// const memoizedFiltering = React.useCallback(() => handleSearching(), [search, items]);
 
-	React.useEffect(() => memoizedFiltering(), [search, items]);
+	React.useEffect(() => handleSearching(), [search, items]);
 	React.useEffect(() => getItems(), []);
 
 	React.useEffect(() => {
@@ -493,7 +495,7 @@ const Inventory = props => {
 										<TableCell><b>Item name</b></TableCell>
 				            <TableCell align="right"><b>Quantity</b></TableCell>
 				            <TableCell align="right"><b>Price</b></TableCell>
-				            <TableCell align="right"><b>Date delivered</b></TableCell>
+				            {/*<TableCell align="right"><b>Date delivered</b></TableCell>*/}
 				            {/*<TableCell align="right"><b>Date released</b></TableCell>*/}
 				            <TableCell align="center"><b>Action</b></TableCell>
 				            <TableCell align="center"><b>Status</b></TableCell>
@@ -532,7 +534,6 @@ const Inventory = props => {
 	    }
     	</SpeedDial>
     	<AddItemBox
-    		update={getItems}
       	addItem={addItem}
     		fullScreen={fullScreen} 
     		openAddBox={openAddBox} 
@@ -556,7 +557,6 @@ const AddItemBox = props => {
 		fullScreen,
 		openAddBox,
 		handleAddBox,
-		update
 	} = props;
 
 	let today = new Date().toISOString().split('T')[0];
@@ -686,7 +686,6 @@ const AddItemBox = props => {
 
         		handleAddBox();
         		addItem( item );
-        		update();
         	}} 
         	autoFocus
         >
@@ -705,7 +704,6 @@ const EditItemBox = props => {
 		openEditBox,
 		selectedItem,
 		handleEditBox,
-		update
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -874,8 +872,8 @@ const EditItemBox = props => {
 									) return enqueueSnackbar('All fields are required', { variant: 'error' });
 	          		
 	          		handleEditBox();
+		          	console.log( item );
 	          		editItem( item );
-	          		update();
 	          	}} 
 	          	autoFocus
 	          >

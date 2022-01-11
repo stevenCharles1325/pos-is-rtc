@@ -24,6 +24,7 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Tooltip from '@mui/material/Tooltip';
 import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
 import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -35,7 +36,9 @@ import Autocomplete from '@mui/material/Autocomplete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DialogContentText from '@mui/material/DialogContentText';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
 import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
@@ -96,10 +99,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
 const actions = [
 	{ icon: <AddIcon/>, name: 'Add an item' },
 	{ icon: <ArrowCircleDownIcon/>, name: 'Download as spreadsheet'}
 ];
+
 
 const Item = props => {
 	const {
@@ -122,18 +129,18 @@ const Item = props => {
 		}
 	}
 
-	React.useEffect(() => {
-		if( count === 0 ){
-			enqueueSnackbar(`${props.name} has been sold out`, { variant: 'success' });
-		}	
-	}, [count]);
+	// React.useEffect(() => {
+	// 	if( count === 0 ){
+	// 		enqueueSnackbar(`${props.name} has been sold out`, { variant: 'success' });
+	// 	}	
+	// }, [count]);
 
 	return(
 		<TableRow sx={{ paddingTop: '5px', paddingBottom: '5px' }}>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.name } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { count } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.srp } </TableCell>
-			{/*<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>*/}
+			<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>
 			<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="center">
 				{/*<IconButton 
@@ -197,14 +204,12 @@ const Inventory = props => {
 	const [openAddBox, setOpenAddBox] = React.useState( false );
 	const [openEditBox, setOpenEditBox] = React.useState( false );
 
-	const [items, setItems] = React.useState( [] ); // accumulator of items
+	const [items, setItems] = React.useState( [] );
 	const [message, setMessage] = React.useState( null );
-	const [renderedItems, setRenderedItems] = React.useState( [] ); // Row
-	const [filteredItems, setFilteredItems] = React.useState( null ); // Search filtered items
+	const [renderedItems, setRenderedItems] = React.useState( [] );
+	const [filteredItems, setFilteredItems] = React.useState( null );
 	const [selectedItem, setSelectedItem] = React.useState( null );
-
-	const [options, setOptions] = React.useState([]);
-	const [dropDown, setDropDown] = React.useState( false );
+	const [dropDownItems, setDropDownItems] = React.useState( [] );
 
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -230,81 +235,94 @@ const Inventory = props => {
 			}
 		})
 		.then( res => {
-			setItems([ ...res.data.items ]);
-			
-			if (res.data.items.length)
-				enqueueSnackbar( res.data.message, { variant: 'success' });
+			const ddItems = [];
+
+			res.data.items.forEach((item, index) => {
+				ddItems.push({
+					_id: item._id,
+					name: item.name,
+					quantity: item.quantity,
+					srp: item.srp,
+					dateDelivered: renderDate( item.dateDelivered ),
+					dateReleased: renderDate( item.dateReleased )
+				});
+			});
+
+			setDropDownItems([ ...ddItems ]);
+
+			// if (res.data.items.length)
+			// 	enqueueSnackbar( res.data.message, { variant: 'success' });
 		})
 		.catch( err => {
 			errorHandler.handle( err, getItems, 3 );
 		});
 	}
 
-	const addItem = async item => {
-		enqueueSnackbar('Please wait...');
+	// const addItem = async item => {
+	// 	enqueueSnackbar('Please wait...');
 
-		const token = Cookies.get('token');
+	// 	const token = Cookies.get('token');
 
-		axios.post(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/add-shop-item`, { item }, {
-			headers: {
-				'authentication': `Bearer ${ token }`
-			}
-		})
-		.then( res => {
-			enqueueSnackbar( res.data.message, { variant: 'success' });			
-			setItems( items => [ ...items, res.data.item ]);
-		})
-		.catch( err => {
-			if( err?.response?.status === 403 ){
-				return enqueueSnackbar( err.response.data.message, { variant: 'error' });
-			}
-			errorHandler.handle( err, addItem, 4, null, item );
-		});
-	}
+	// 	axios.post(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/add-shop-item`, { item }, {
+	// 		headers: {
+	// 			'authentication': `Bearer ${ token }`
+	// 		}
+	// 	})
+	// 	.then( res => {
+	// 		enqueueSnackbar( res.data.message, { variant: 'success' });			
+	// 		setItems( items => [ ...items, res.data.item ]);
+	// 	})
+	// 	.catch( err => {
+	// 		if( err?.response?.status === 403 ){
+	// 			return enqueueSnackbar( err.response.data.message, { variant: 'error' });
+	// 		}
+	// 		errorHandler.handle( err, addItem, 4, null, item );
+	// 	});
+	// }
 
-	const updateItem = async item => {
-		enqueueSnackbar(`Updating ${item.name}!`);
+	// const updateItem = async item => {
+	// 	enqueueSnackbar(`Updating ${item.name}!`);
 
-		const token = Cookies.get('token');
+	// 	const token = Cookies.get('token');
 
-		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/update-shop-item`, item, {
-			headers: {
-				'authentication': `Bearer ${ token }`
-			}
-		})
-		.then( res => { 
-			enqueueSnackbar( res.data.message, { variant: 'success' });					
-			setItems(() => [ ...res.data.items ]);
-		})
-		.catch( err => {
-			errorHandler.handle( err, updateItem, 5, null, item );
-		});
-	}
+	// 	axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/update-shop-item`, item, {
+	// 		headers: {
+	// 			'authentication': `Bearer ${ token }`
+	// 		}
+	// 	})
+	// 	.then( res => { 
+	// 		enqueueSnackbar( res.data.message, { variant: 'success' });					
+	// 		setItems(() => [ ...res.data.items ]);
+	// 	})
+	// 	.catch( err => {
+	// 		errorHandler.handle( err, updateItem, 5, null, item );
+	// 	});
+	// }
 
-	const deleteItem = id => {
-		if( !id ) return;
+	// const deleteItem = id => {
+	// 	if( !id ) return;
 
-		const ItemRemoval = async id => {
-			const token = Cookies.get('token');
+	// 	const ItemRemoval = async id => {
+	// 		const token = Cookies.get('token');
 
-			axios.delete(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/delete-shop-item/${ id }`, {
-				headers: {
-					'authentication': `Bearer ${ token }`
-				}
-			})
-			.then( res => {
-				enqueueSnackbar( res.data.message, { variant: 'success' });
-			})
-			.catch( err => {
-				errorHandler.handle( err, ItemRemoval, 6, null, id );
-			});
-		}
+	// 		axios.delete(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/delete-shop-item/${ id }`, {
+	// 			headers: {
+	// 				'authentication': `Bearer ${ token }`
+	// 			}
+	// 		})
+	// 		.then( res => {
+	// 			enqueueSnackbar( res.data.message, { variant: 'success' });
+	// 		})
+	// 		.catch( err => {
+	// 			errorHandler.handle( err, ItemRemoval, 6, null, id );
+	// 		});
+	// 	}
 
-		ItemRemoval( id );
+	// 	ItemRemoval( id );
 
-		let newItems = items.filter( item => item._id !== id );
-		setItems([...newItems]);
-	}
+	// 	let newItems = items.filter( item => item._id !== id );
+	// 	setItems([...newItems]);
+	// }
 
 	const buyItem = async ([id, name]) => {
 		const token = Cookies.get('token');
@@ -315,6 +333,16 @@ const Inventory = props => {
 			}
 		})
 		.then( res => {
+			let newDropDownItems = [...dropDownItems].map( item => {
+				if( item._id === id ){
+					item.quantity -= 1;
+				}
+
+				return item;
+			});
+
+			setDropDownItems([ ...newDropDownItems ]);
+			// debounce(getItems, 3000)();
 			enqueueSnackbar(`Successfully sold 1 ${ name }`, { variant: 'success' });
 		})
 		.catch( err => {
@@ -369,9 +397,9 @@ const Inventory = props => {
 					buy={buyItem}
 					key={uniqid()}
 					update={getItems}
-					handleUpdate={ updateItem }
-					handleDelete={ deleteItem }
-					handleEditBox={ handleEditBox }
+					// handleUpdate={ updateItem }
+					// handleDelete={ deleteItem }
+					// handleEditBox={ handleEditBox }
 					setSelectedItem={ setSelectedItem }
 				/>
 			));
@@ -381,7 +409,7 @@ const Inventory = props => {
 		sortedItems.sort((item1, item2) => new Date( item1.dateDelivered ) - new Date( item2.dateDelivered ));	
 
 		sortedItems.reverse().forEach( item => {
-			if(item.name.toLowerCase().includes( search.toLowerCase() )){
+			if(item?.name?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) || item.dateDelivered?.includes?.( search )){
 				addToFilteredItems( item );
 			}
 		});
@@ -405,23 +433,45 @@ const Inventory = props => {
 	React.useEffect(() => getItems(), []);
 
 	React.useEffect(() => {
-		if( items.lenght ){
-			const tempOptions = [];
-			items.forEach( item => {
-				tempOptions.push({ name: item.name, dateDelivered: item.dateDelivered });
-			});
-
-			setOptions([ ...tempOptions ]);
-		}
-	}, [items]);
-
-	React.useEffect(() => {
 		if( renderedItems.length ){
 			if( page === renderedItems.length && !renderedItems[ renderedItems.length - 1 ].length ){
 				setPage( page => page - 1 );
 			}
 		}
 	}, [renderedItems, page]);
+
+	React.useEffect(() => {
+		if( dropDownItems && dropDownItems.length ){
+			let dvs =  Cookies.get('defaultValues');
+
+			if( dvs ){
+				dvs = JSON.parse( dvs );
+				let newDvs = dvs ?? [];
+				
+				if( dvs && dvs.length ){
+					const ddNames = dropDownItems.map(item => item.name );
+
+					dvs.map( dv => dv.name )
+					.forEach((name, index) => {
+						if( !ddNames.includes( name ) ){
+							console.log('here');
+							newDvs = newDvs.filter((_, index) => index != index );
+						}
+						else{
+							console.log('here2');
+
+							const nameIndex = newDvs.map( item => item.name ).indexOf( name );
+							newDvs[ nameIndex ] = dropDownItems[ ddNames.indexOf( name ) ];
+						}
+					});
+
+					Cookies.set('defaultValues', JSON.stringify( newDvs ));	
+				}
+
+				if( newDvs && newDvs.length ) setItems([ ...newDvs ]);
+			}
+		}
+	}, [dropDownItems]);
 
 	return(
 		<div 
@@ -510,7 +560,7 @@ const Inventory = props => {
 										<TableCell><b>Item name</b></TableCell>
 				            <TableCell align="right"><b>Quantity</b></TableCell>
 				            <TableCell align="right"><b>Price</b></TableCell>
-				            {/*<TableCell align="right"><b>Date delivered</b></TableCell>*/}
+				            <TableCell align="right"><b>Date delivered</b></TableCell>
 				            <TableCell align="right"><b>Date released</b></TableCell>
 				            <TableCell align="center"><b>Action</b></TableCell>
 				            <TableCell align="center"><b>Status</b></TableCell>
@@ -539,13 +589,13 @@ const Inventory = props => {
 					right: '3%'
 				}}
 			>
-				<IconButton sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+				<IconButton 
+					onClick={handleAddBox}
+					sx={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+				>
 					<AddIcon/>
 				</IconButton>
 			</div>
-			<DropDownDialog
-
-			/>
 			{/*<SpeedDial
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}
@@ -562,14 +612,17 @@ const Inventory = props => {
 		        ))
 	    }
     	</SpeedDial>*/}
-    	{/*<AddItemBox 
-    		update={getItems}
-      	addItem={addItem}
+    	<AddItemBox 
+    		// update={getItems}
+      	// addItem={addItem}
+      	defaultValues={items}
+      	setItems={setItems}
+      	items={dropDownItems}
     		fullScreen={fullScreen} 
     		openAddBox={openAddBox} 
     		handleAddBox={handleAddBox}
     	/>
-    	<EditItemBox 
+    	{/*<EditItemBox 
     		update={getItems}
     		editItem={updateItem}
     		fullScreen={fullScreen} 
@@ -581,142 +634,23 @@ const Inventory = props => {
 	);
 }
 
-
-const DropDownDialog = props => {
-	const [currentSelected, setCurrentSelected] = React.useState( [] );
-
-	React.useEffect(() => {
-		const selectedData = Cookies.get('selectedData');
-
-		if( selectedData ){
-			setCurrentSelected([ ...selectedData ]);
-		}
-	}, []);
-
-	return(
-		<Dialog onClose={props.handleClose} open={props.open}>
-      <DialogTitle>Choose Model</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-         	Select MyPhone model and their date delivered.
-        </DialogContentText>
-          <Autocomplete
-			      id="model-select"
-			      sx={{ width: '100%' }}
-			      onChange={(_, value) => {
-			      	const selectedData = Cookies.get('selectedData');
-			      	selectedData.push( value );
-			      	Cookies.set('selectedData', selectedData);
-
-			      	// set value
-			      	setCurrentSelected( currentSelected => [ ...currentSelected, value ]);
-			      }}
-			      options={props.options}
-			      autoHighlight
-			      getOptionLabel={(option) => `${option.name} - ${renderDate( option.dateDelivered )}`}
-			      renderOption={(props, option) => (
-			        <Box component="li" {...props}>
-			          {`${option.name} - ${renderDate( option.dateDelivered )}`}
-			        </Box>
-			      )}
-			      renderInput={(params) => (
-			        <TextField
-			          {...params}
-			          label="Choose a model or date delivered"
-			          inputProps={{
-			            ...params.inputProps,
-			            autoComplete: 'new-password', // disable autocomplete and autofill
-			          }}
-			        />
-			      )}
-			    />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={props.handleClose}>Cancel</Button>
-          <Button onClick={props.handleSelect}>Select</Button>
-        </DialogActions>
-    </Dialog>
-	);
-}
-
 const AddItemBox = props => {
-	const { 
-		addItem,
+	const {
+		items,
+		setItems,
+		openAddBox, 
 		fullScreen,
-		openAddBox,
 		handleAddBox,
-		update
+		defaultValues,
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
 
-	const [item, setItem] = React.useState({
-		name: '',
-		quantity: 0,
-		srp: 0,
-		dateDelivered: '',
-		dateReleased: ''
-	});
+	const handleAddItem = (_, val) => {
+		if( !val ) return;
 
-	const handleName = e => {
-		setItem( item => ({
-			name: e.target.value,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
-
-	const handleCount = e => {
-		setItem( item => ({
-			name: item.name,
-			quantity: e.target.value,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
-
-	const handleSrp = e => {
-		setItem( item => ({
-			name: item.name,
-			quantity: item.quantity,
-			srp: e.target.value,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
-
-
-	const handleImei = e => {
-		setItem( item => ({
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
-
-	const handleDateDelivered = e => {
-		setItem( item => ({
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: e.target.value,
-			dateReleased: item.dateReleased	
-		}));
-	}
-
-	const handleDateReleased = e => {
-		setItem( item => ({
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: e.target.value
-		}));
+		Cookies.set('defaultValues', JSON.stringify( val ));
+		setItems( items => [...val] );
 	}
 
 	return(
@@ -725,46 +659,48 @@ const AddItemBox = props => {
       fullScreen={fullScreen}
       open={openAddBox}
       onClose={handleAddBox}
-      aria-labelledby="responsive-dialog-title"
-      maxWidth="md"
+      aria-labelledby="responsive-dialog-title2"
+      maxWidth="sm"
 	  >
-      <DialogTitle id="responsive-dialog-title">
-        {'Add item'}
+      <DialogTitle id="responsive-dialog-title2">
+        {'Select items to put into inventory'}
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Please fill up all text fields.
+          You can select any number of items.
         </DialogContentText>
-
-        <Stack spacing={5}>
-          <TextField onChange={handleName} autoFocus variant="filled" label="Item name"/>
-          <TextField onChange={handleCount} variant="filled" type="number" label="Item quantity"/>
-          <TextField onChange={handleSrp} variant="filled" type="number" label="Item price"/>
-          <TextField onChange={handleDateDelivered} variant="standard" type='date' helperText="Date delivered"/>
-          <TextField onChange={handleDateReleased} variant="standard" type='date' helperText="Date released"/>
-      </Stack>
+        <Divider/>
+        <div className="col-12 py-2">
+	        <Autocomplete
+			      multiple
+			      id="checkboxes-tags-demo"
+			      options={items}
+			      disableCloseOnSelect
+			      defaultValue={defaultValues}
+			      onChange={handleAddItem}
+			      getOptionLabel={(option) => option.name + ' - ' +  option.dateDelivered }
+			      renderOption={(props, option, { selected }) => (
+			        <li {...props}>
+			          <Checkbox
+			            icon={icon}
+			            checkedIcon={checkedIcon}
+			            style={{ marginRight: 8 }}
+			            checked={selected}
+			          />
+			          <p><strong>Name: </strong>{ option.name }, <strong> Date-delivered: </strong> { option.dateDelivered }</p>
+			        </li>
+			      )}
+			      style={{ width: '100%' }}
+			      renderInput={(params) => (
+			        <TextField {...params} variant="filled" label="Select Items" placeholder="MyPhone item" />
+			      )}
+			    />
+        </div>
       </DialogContent>
       
       <DialogActions>
         <Button onClick={handleAddBox}>
-          Discard
-        </Button>
-        <Button 
-        	onClick={() => {
-        		if( !item || !item.name.length ||
-							!item.quantity ||
-							!item.srp ||
-							!item.dateDelivered ||
-							!item.dateReleased
-							) return enqueueSnackbar('All fields are required', { variant: 'error' });
-
-        		handleAddBox();
-        		addItem( item );
-        		update();
-        	}} 
-        	autoFocus
-        >
-          Add
+          Close
         </Button>
       </DialogActions>
 		</Dialog>
@@ -772,192 +708,192 @@ const AddItemBox = props => {
 }
 
 
-const EditItemBox = props => {
-	const {
-		editItem,
-		fullScreen,
-		openEditBox,
-		selectedItem,
-		handleEditBox,
-		update
-	} = props;
+// const EditItemBox = props => {
+// 	const {
+// 		editItem,
+// 		fullScreen,
+// 		openEditBox,
+// 		selectedItem,
+// 		handleEditBox,
+// 		update
+// 	} = props;
 
-	const { enqueueSnackbar } = useSnackbar();
+// 	const { enqueueSnackbar } = useSnackbar();
 
-	const [item, setItem] = React.useState({
-		_id: '',
-		name: '',
-		quantity: '',
-		srp: '',
-		dateDelivered: '',
-		dateReleased: '' 
-	});
+// 	const [item, setItem] = React.useState({
+// 		_id: '',
+// 		name: '',
+// 		quantity: '',
+// 		srp: '',
+// 		dateDelivered: '',
+// 		dateReleased: '' 
+// 	});
 
-	React.useEffect(() => {
-		if( selectedItem ){
-			setItem({
-				_id: selectedItem?._id,
-				name: selectedItem?.name,
-				quantity: selectedItem?.quantity,
-				srp: selectedItem?.srp,
-				dateDelivered: selectedItem?.dateDelivered,
-				dateReleased: selectedItem?.dateReleased
-			});
-		}
-	}, [selectedItem]);
+// 	React.useEffect(() => {
+// 		if( selectedItem ){
+// 			setItem({
+// 				_id: selectedItem?._id,
+// 				name: selectedItem?.name,
+// 				quantity: selectedItem?.quantity,
+// 				srp: selectedItem?.srp,
+// 				dateDelivered: selectedItem?.dateDelivered,
+// 				dateReleased: selectedItem?.dateReleased
+// 			});
+// 		}
+// 	}, [selectedItem]);
 
-	const handleName = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: e.target.value,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
+// 	const handleName = e => {
+// 		setItem( item => ({
+// 			_id: selectedItem?._id,
+// 			name: e.target.value,
+// 			quantity: item.quantity,
+// 			srp: item.srp,
+// 			dateDelivered: item.dateDelivered,
+// 			dateReleased: item.dateReleased	
+// 		}));
+// 	}
 
-	const handleCount = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: item.name,
-			quantity: e.target.value,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
+// 	const handleCount = e => {
+// 		setItem( item => ({
+// 			_id: selectedItem?._id,
+// 			name: item.name,
+// 			quantity: e.target.value,
+// 			srp: item.srp,
+// 			dateDelivered: item.dateDelivered,
+// 			dateReleased: item.dateReleased	
+// 		}));
+// 	}
 
-	const handleSrp = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: item.name,
-			quantity: item.quantity,
-			srp: e.target.value,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
+// 	const handleSrp = e => {
+// 		setItem( item => ({
+// 			_id: selectedItem?._id,
+// 			name: item.name,
+// 			quantity: item.quantity,
+// 			srp: e.target.value,
+// 			dateDelivered: item.dateDelivered,
+// 			dateReleased: item.dateReleased	
+// 		}));
+// 	}
 
 
-	const handleImei = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: item.dateReleased	
-		}));
-	}
+// 	const handleImei = e => {
+// 		setItem( item => ({
+// 			_id: selectedItem?._id,
+// 			name: item.name,
+// 			quantity: item.quantity,
+// 			srp: item.srp,
+// 			dateDelivered: item.dateDelivered,
+// 			dateReleased: item.dateReleased	
+// 		}));
+// 	}
 
-	const handleDateDelivered = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: e.target.value,
-			dateReleased: item.dateReleased	
-		}));
-	}
+// 	const handleDateDelivered = e => {
+// 		setItem( item => ({
+// 			_id: selectedItem?._id,
+// 			name: item.name,
+// 			quantity: item.quantity,
+// 			srp: item.srp,
+// 			dateDelivered: e.target.value,
+// 			dateReleased: item.dateReleased	
+// 		}));
+// 	}
 
-	const handleDateReleased = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: e.target.value
-		}));
-	}
+// 	const handleDateReleased = e => {
+// 		setItem( item => ({
+// 			_id: selectedItem?._id,
+// 			name: item.name,
+// 			quantity: item.quantity,
+// 			srp: item.srp,
+// 			dateDelivered: item.dateDelivered,
+// 			dateReleased: e.target.value
+// 		}));
+// 	}
 
-	return(
-		<Dialog
-			fullWidth={true}
-	        fullScreen={fullScreen}
-	        open={openEditBox}
-	        onClose={handleEditBox}
-	        aria-labelledby="responsive-dialog-title"
-	        maxWidth="md"
-	    >
-	        <DialogTitle id="responsive-dialog-title">
-	          {'Edit item'}
-	        </DialogTitle>
-	        <DialogContent>
-	          <DialogContentText>
-	            Remember to save before you exit.
-	          </DialogContentText>
+// 	return(
+// 		<Dialog
+// 			fullWidth={true}
+// 	        fullScreen={fullScreen}
+// 	        open={openEditBox}
+// 	        onClose={handleEditBox}
+// 	        aria-labelledby="responsive-dialog-title"
+// 	        maxWidth="md"
+// 	    >
+// 	        <DialogTitle id="responsive-dialog-title">
+// 	          {'Edit item'}
+// 	        </DialogTitle>
+// 	        <DialogContent>
+// 	          <DialogContentText>
+// 	            Remember to save before you exit.
+// 	          </DialogContentText>
 
-	          <Stack spacing={5}>
-		          <TextField 
-		          	onChange={handleName} 
-		          	defaultValue={selectedItem?.name} 
-		          	autoFocus 
-		          	variant="filled" 
-		          	label="Item name"
-		          />
+// 	          <Stack spacing={5}>
+// 		          <TextField 
+// 		          	onChange={handleName} 
+// 		          	defaultValue={selectedItem?.name} 
+// 		          	autoFocus 
+// 		          	variant="filled" 
+// 		          	label="Item name"
+// 		          />
 		          
-		          <TextField 
-		          	onChange={handleCount} 
-		          	defaultValue={selectedItem?.quantity} 
-		          	autoFocus 
-		          	variant="filled" 
-		          	label="Item quantity"
-		          />
+// 		          <TextField 
+// 		          	onChange={handleCount} 
+// 		          	defaultValue={selectedItem?.quantity} 
+// 		          	autoFocus 
+// 		          	variant="filled" 
+// 		          	label="Item quantity"
+// 		          />
 		          
-		          <TextField 
-		          	onChange={handleSrp} 
-		          	defaultValue={selectedItem?.srp} 
-		          	variant="filled" 
-		          	type="number" 
-		          	label="Item price"
-		          />
+// 		          <TextField 
+// 		          	onChange={handleSrp} 
+// 		          	defaultValue={selectedItem?.srp} 
+// 		          	variant="filled" 
+// 		          	type="number" 
+// 		          	label="Item price"
+// 		          />
 		          
-		          <TextField 
-		          	onChange={handleDateDelivered} 
-		          	defaultValue={renderDate(selectedItem?.dateDelivered)} 
-		          	variant="standard" 
-		          	type='date' 
-		          	helperText="Date delivered"
-		          />
+// 		          <TextField 
+// 		          	onChange={handleDateDelivered} 
+// 		          	defaultValue={renderDate(selectedItem?.dateDelivered)} 
+// 		          	variant="standard" 
+// 		          	type='date' 
+// 		          	helperText="Date delivered"
+// 		          />
 
-		          <TextField 
-		          	onChange={handleDateReleased} 
-		          	defaultValue={renderDate(selectedItem?.dateReleased)} 
-		          	variant="standard" 
-		          	type='date' 
-		          	helperText="Date released"
-		          />
-		      </Stack>
-	        </DialogContent>
+// 		          <TextField 
+// 		          	onChange={handleDateReleased} 
+// 		          	defaultValue={renderDate(selectedItem?.dateReleased)} 
+// 		          	variant="standard" 
+// 		          	type='date' 
+// 		          	helperText="Date released"
+// 		          />
+// 		      </Stack>
+// 	        </DialogContent>
 	        
-	        <DialogActions>
-	          <Button onClick={handleEditBox}>
-	            Discard
-	          </Button>
-	          <Button 
-	          	onClick={() => {
-	          		if( !item || !item.name.length ||
-									!item.quantity ||
-									!item.srp ||
-									!item.dateDelivered ||
-									!item.dateReleased
-									) return enqueueSnackbar('All fields are required', { variant: 'error' });
+// 	        <DialogActions>
+// 	          <Button onClick={handleEditBox}>
+// 	            Discard
+// 	          </Button>
+// 	          <Button 
+// 	          	onClick={() => {
+// 	          		if( !item || !item.name.length ||
+// 									!item.quantity ||
+// 									!item.srp ||
+// 									!item.dateDelivered ||
+// 									!item.dateReleased
+// 									) return enqueueSnackbar('All fields are required', { variant: 'error' });
 	          		
-	          		handleEditBox();
-	          		editItem( item );
-	          		update();
-	          	}} 
-	          	autoFocus
-	          >
-	            Save
-	          </Button>
-	        </DialogActions>
-		</Dialog>
-	);
-}
+// 	          		handleEditBox();
+// 	          		editItem( item );
+// 	          		update();
+// 	          	}} 
+// 	          	autoFocus
+// 	          >
+// 	            Save
+// 	          </Button>
+// 	        </DialogActions>
+// 		</Dialog>
+// 	);
+// }
 
 const renderDate = date => {
 	if( !date ) return '';
