@@ -126,8 +126,8 @@ const Appbar = props => {
 					onClick: () => setToThisView('/item-list')
 				},
 				{
-					title: 'Transactions',
-					onClick: () => setToThisView('/transactions')
+					title: 'Records',
+					onClick: () => setToThisView('/records')
 				}
 		]);
 
@@ -160,8 +160,8 @@ const Appbar = props => {
 			case '/accounts':
 				return 'Accounts';
 
-			case '/transactions':
-				return 'Transactions';
+			case '/records':
+				return 'Records';
 		}
 	}
 

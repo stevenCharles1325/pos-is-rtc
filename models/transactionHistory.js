@@ -5,7 +5,9 @@ const transactionListScheme = new Schema({
 	soldBy	: { type: String, required: true },
 	itemName 	: 	{ type: String, required: true },
 	srp 	: 	{ type: Number, required: true },
-	date	: 	{ type: String, required: true }
+	date	: 	{ type: String, required: true },
+	year	: 	{ type: String, required: true },
+	month	: 	{ type: String, required: true },
 });
 
 

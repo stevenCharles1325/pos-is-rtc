@@ -100,6 +100,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
+const monthIndices = {
+		'Jan': 0,
+		'Feb': 1,
+		'Mar': 2,
+		'Apr': 3,
+		'May': 4,
+		'Jun': 5,
+		'Jul': 6,
+		'Aug': 7,
+		'Sep': 8,
+		'Oct': 9,
+		'Nov': 10,
+		'Dec': 11,
+}
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -118,15 +133,39 @@ const Item = props => {
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.soldBy } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.itemName } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.srp } </TableCell>
-			<TableCell align="right"> { props.date } </TableCell>
+			<TableCell align="right"> { props.date.split(' ').filter((_, i) => i < 5).join(' ') } </TableCell>
 		</TableRow>
 	);
 }
 
+const Item2 = props => {
+	const { enqueueSnackbar } = useSnackbar();
+	const [elevated, setElevated] = React.useState( false );
+
+	return(
+		<TableRow sx={{ paddingTop: '5px', paddingBottom: '5px' }}>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 0 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 1 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 2 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 3 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 4 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 5 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 6 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 7 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 8 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 9 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 10 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 11 ] } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.year } </TableCell>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.total } </TableCell>
+		</TableRow>
+	);
+}
 
 const Inventory = props => {
 	const chunksLimit = 7;
 	const [page, setPage] = React.useState( 1 );
+	const [page2, setPage2] = React.useState( 1 );
 
 	const { errorHandler, search, setSearch } = props.tools;
 	const { enqueueSnackbar } = useSnackbar();
@@ -138,6 +177,9 @@ const Inventory = props => {
 	const [items, setItems] = React.useState( [] );
 	const [message, setMessage] = React.useState( null );
 	const [renderedItems, setRenderedItems] = React.useState( [] );
+	const [records, setRecords] = React.useState( [] );
+	const [years, setYears] = React.useState( {} );
+
 	// const [filteredItems, setFilteredItems] = React.useState( null );
 	// const [selectedItem, setSelectedItem] = React.useState( null );
 
@@ -209,9 +251,6 @@ const Inventory = props => {
 			chunkSet.push( chunk );	
 
 			index += chunksLimit;
-
-			console.log( filtered.length );
-			console.log( Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0) ? 0 : 1 );
 		}
 		while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
 
@@ -232,6 +271,70 @@ const Inventory = props => {
 			}
 		}
 	}, [renderedItems, page]);
+
+	React.useEffect(() => {
+		console.log( items );	
+		items?.forEach?.( item => {
+				if( years?.[ item.year ] ){
+					let index = monthIndices[ item.month ];
+						
+					console.log( 'here' );
+					console.log( index );
+					years[ item.year ][ index ] += 1;
+				}
+				else{
+					const year = item.year;
+
+					const newYearsRecord = { ...years };
+					newYearsRecord[ year ] = Array( 12 ).fill( 0 )
+
+					setYears({ ...newYearsRecord });
+				}						
+		});
+	}, [items, years]);
+
+	React.useEffect(() => {
+			let yearKeys = Object.keys( years );
+
+			if( yearKeys.length	){
+				const chunkLimit = 7;
+				const yrList = [];
+				let chunkSet = [];
+
+				yearKeys.forEach( yr => {
+					yrList.push(
+								<Item2
+									key={uniqid()}
+									year={ yr }
+									month={ [...years[ yr ]] }
+									total={ years[ yr ].reduce((val, accum) => val + accum) }
+								/>
+						);
+				});
+
+				let index = 0;
+				do{
+					const chunk = yrList.slice(index, index + chunksLimit);
+
+					chunkSet.push( chunk );	
+
+					index += chunksLimit;
+				}
+				while( chunkSet.length < Math.floor( yrList.length / chunksLimit ) + (yrList % chunksLimit === 0 ? 0 : 1 ));
+
+				setRecords([ ...chunkSet	]);
+			}		
+	}, [years]);
+
+	React.useEffect(() => {
+		if( records.length ){
+			if( page2 === records.length && !records[ records.length - 1 ].length ){
+				if( page2 - 1 > 0 ){
+					setPage2( page2 => page2 - 1 );
+				}
+			}
+		}
+	}, [records, page2]);
 
 	return(
 		<div 
@@ -277,7 +380,7 @@ const Inventory = props => {
 					overflowX: 'hidden',
 					padding: '3% 10% 0 10%'
 				}}
-				className="row d-flex justify-content-around align-items-start"
+				className="row"
 			>
 				<Paper sx={{ height: '500px' }}>
 					<Stack sx={{ height: '500px' }} direction="column" justifyContent="space-between" alignItems="center">
@@ -299,6 +402,43 @@ const Inventory = props => {
 						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
 							<div className="col-8 d-flex justify-content-center align-items-center">
 								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+							</div>
+						</div>
+					</Stack>
+				</Paper>
+				<br/>
+				<Divider/>
+				<br/>
+				<Paper sx={{ height: '500px', marginBottom: '100px' }}>
+					<Stack sx={{ height: '500px' }} direction="column" justifyContent="space-between" alignItems="center">
+						<TableContainer>
+							<Table>
+								<TableHead>
+									<TableRow>
+				            <TableCell align="left"><b>Jan</b></TableCell>
+				            <TableCell align="left"><b>Feb</b></TableCell>
+				            <TableCell align="left"><b>Mar</b></TableCell>
+				            <TableCell align="left"><b>Apr</b></TableCell>
+				            <TableCell align="left"><b>May</b></TableCell>
+				            <TableCell align="left"><b>Jun</b></TableCell>
+				            <TableCell align="left"><b>Jul</b></TableCell>
+				            <TableCell align="left"><b>Aug</b></TableCell>
+				            <TableCell align="left"><b>Sep</b></TableCell>
+				            <TableCell align="left"><b>Oct</b></TableCell>
+				            <TableCell align="left"><b>Nov</b></TableCell>
+				            <TableCell align="left"><b>Dec</b></TableCell>
+				            <TableCell align="left"><b>Year</b></TableCell>
+				            <TableCell align="left"><b>Total</b></TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{ records[ page2 - 1 ] }
+								</TableBody>
+							</Table>
+						</TableContainer>
+						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
+							<div className="col-8 d-flex justify-content-center align-items-center">
+								<Pagination count={ !records?.[ records?.length - 1 ]?.length ? records?.length - 1 : records?.length } page={page2} onChange={(_, value) => setPage2( value )}/>
 							</div>
 						</div>
 					</Stack>

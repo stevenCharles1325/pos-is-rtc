@@ -32,7 +32,7 @@ const VIEWS = [
   `${ROOT}dashboard`, // 4
   `${ROOT}account`, // 5
   `${ROOT}item-list`, // 6
-  `${ROOT}transactions`, // 7
+  `${ROOT}records`, // 7
 ];
 
 const validator = new Validator();
@@ -111,7 +111,7 @@ function App() {
           setToThisView( path.pathname );
           break;
 
-        case '/transactions':
+        case '/records':
           setToThisView( path.pathname );
           break;
 
@@ -170,7 +170,7 @@ function App() {
                         <ItemList tools={tools}/>
                       </Route>
 
-                      <Route exact path="/transactions">
+                      <Route exact path="/records">
                         <Appbar tools={tools}/>
                         <Transactions tools={tools}/>
                       </Route>

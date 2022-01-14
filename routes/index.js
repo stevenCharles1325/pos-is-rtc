@@ -294,11 +294,14 @@ router.put('/buy-shop-item/:id/sold-by/:username', authentication, async ( req, 
           data.save( err => {
             if( err ) return res.sendStatus( 503 );
 
+            const dateToday = new Date().toString();
             TransactionList.create({ 
               soldBy: req.params.username, 
               itemName: doc.name,
               srp: doc.srp,
-              date: new Date().toString()
+              date: dateToday,
+              year: dateToday.split(' ')[ 3 ],
+              month: dateToday.split(' ')[ 1 ]
             }, err => {
                 if( err ) return res.sendStatus( 503 );
 
