@@ -144,6 +144,7 @@ const Item2 = props => {
 
 	return(
 		<TableRow sx={{ paddingTop: '5px', paddingBottom: '5px' }}>
+			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.year } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 0 ] } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 1 ] } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 2 ] } </TableCell>
@@ -156,7 +157,6 @@ const Item2 = props => {
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 9 ] } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 10 ] } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.month[ 11 ] } </TableCell>
-			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.year } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} component="th" scope="row"> { props.total } </TableCell>
 		</TableRow>
 	);
@@ -391,7 +391,7 @@ const Inventory = props => {
 				            <TableCell align="left"><b>Sold By</b></TableCell>
 				            <TableCell align="right"><b>Item Name</b></TableCell>
 				            <TableCell align="right"><b>Price</b></TableCell>
-				            <TableCell align="right"><b>Date of Transaction</b></TableCell>
+				            <TableCell align="right"><b>Date Released</b></TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
@@ -415,6 +415,7 @@ const Inventory = props => {
 							<Table>
 								<TableHead>
 									<TableRow>
+				            <TableCell align="left"><b>Year</b></TableCell>
 				            <TableCell align="left"><b>Jan</b></TableCell>
 				            <TableCell align="left"><b>Feb</b></TableCell>
 				            <TableCell align="left"><b>Mar</b></TableCell>
@@ -427,7 +428,6 @@ const Inventory = props => {
 				            <TableCell align="left"><b>Oct</b></TableCell>
 				            <TableCell align="left"><b>Nov</b></TableCell>
 				            <TableCell align="left"><b>Dec</b></TableCell>
-				            <TableCell align="left"><b>Year</b></TableCell>
 				            <TableCell align="left"><b>Total</b></TableCell>
 									</TableRow>
 								</TableHead>
