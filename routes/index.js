@@ -12,6 +12,7 @@ var Item = require('../models/items');
 var Token = require('../models/tokens');
 var MonIncome = require('../models/monthlyIncome');
 var ItemList = require('../models/itemList');
+var TransactionList = require('../models/transactionHistory');
 
 
 const requestAccessToken = ( user ) => {
@@ -269,7 +270,7 @@ router.delete('/delete-shop-item/:id', authentication, async ( req, res ) => {
 });
 
 
-router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
+router.put('/buy-shop-item/:id/sold-by/:username', authentication, async ( req, res ) => {
   const { id } = req.params;
 
   const date = new Date();
@@ -284,25 +285,34 @@ router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
     doc.quantity--;
 
     try{
-      doc.save( err => {
+       MonIncome.findOne({ year: year }, ( err, data ) => {
         if( err ) return res.sendStatus( 503 );
 
-        MonIncome.findOne({ year: year }, ( err, data ) => {
-          if( err ) return res.sendStatus( 503 );
+        if( data ){
+          data[ month.toLowerCase() ] += 1;
 
-          if( data ){
-            data[ month.toLowerCase() ] += 1;
+          data.save( err => {
+            if( err ) return res.sendStatus( 503 );
 
-            data.save( err => {
-              if( err ) return res.sendStatus( 503 );
+            TransactionList.create({ 
+              soldBy: req.params.username, 
+              itemName: doc.name,
+              srp: doc.srp,
+              date: new Date().toString()
+            }, err => {
+                if( err ) return res.sendStatus( 503 );
 
-              return res.sendStatus( 200 );
-            });
-          }
-          else{
-            res.end();
-          }
-        });
+                doc.save( err => {
+                  if( err ) return res.sendStatus( 503 );
+
+                  return res.sendStatus( 200 );
+                });          
+            })
+          });
+        }
+        else{
+          res.end();
+        }
       });
     }
     catch( err ){
@@ -312,6 +322,16 @@ router.put('/buy-shop-item/:id', authentication, async ( req, res ) => {
   });
 });
 
+
+router.get('/transaction-history', async ( req, res, next ) => {
+  TransactionList.find({}, ( err, doc ) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ){
+      return res.json( doc );
+    }
+  });
+});
 
 
 // =========== Exporting database's data into excel spreedsheet ===========

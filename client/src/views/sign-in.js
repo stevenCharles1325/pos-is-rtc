@@ -158,7 +158,6 @@ const Signin = props => {
 					> 
 						{ btnMsg } 
 					</Button>
-					<Button sx={{ color: 'white' }} href="/sign-up">Sign-up?</Button>
 				</div>
 			</div>			
 		</div>

@@ -14,13 +14,13 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
-const ItemList = React.lazy(() => import('./views/itemList'));
-const Accounts = React.lazy(() => import('./views/accounts'));
+const Transactions = React.lazy(() => import('./views/transaction'));
 const Dashboard = React.lazy(() => import('./views/dashboard'));
 const Inventory = React.lazy(() => import('./views/inventory'));
 const Appbar = React.lazy(() => import('./components/app-bar'));
+const ItemList = React.lazy(() => import('./views/itemList'));
+const Accounts = React.lazy(() => import('./views/accounts'));
 const Signin = React.lazy(() => import('./views/sign-in'));
-// const Signup = React.lazy(() => import('./views/sign-up'));
 
 
 const ROOT = '/';
@@ -31,7 +31,8 @@ const VIEWS = [
   `${ROOT}inventory`,// 3
   `${ROOT}dashboard`, // 4
   `${ROOT}account`, // 5
-  `${ROOT}item-list`, // 5
+  `${ROOT}item-list`, // 6
+  `${ROOT}transactions`, // 7
 ];
 
 const validator = new Validator();
@@ -73,6 +74,7 @@ function App() {
       }
     })
     .then( res => {
+      Cookies.set('uname', res.data.user.name );
       setName( res.data.user.name );
       setRole( res.data.user.role );
       setAllow(() => true);
@@ -106,6 +108,10 @@ function App() {
           break;
 
         case '/item-list':
+          setToThisView( path.pathname );
+          break;
+
+        case '/transactions':
           setToThisView( path.pathname );
           break;
 
@@ -162,6 +168,11 @@ function App() {
                       <Route exact path="/item-list">
                         <Appbar tools={tools}/>
                         <ItemList tools={tools}/>
+                      </Route>
+
+                      <Route exact path="/transactions">
+                        <Appbar tools={tools}/>
+                        <Transactions tools={tools}/>
                       </Route>
                     </>
                   )

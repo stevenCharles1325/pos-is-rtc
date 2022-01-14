@@ -11,6 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
@@ -115,7 +116,8 @@ const Item = props => {
 		handleUpdate,
 		handleDelete,
 		buy,
-		update
+		update,
+		hide
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -141,7 +143,7 @@ const Item = props => {
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { count } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="right"> { props.srp } </TableCell>
 			<TableCell align="right"> { renderDate(props.dateDelivered) } </TableCell>
-			<TableCell align="right"> { renderDate(props.dateReleased) } </TableCell>
+			<TableCell align="right"> { renderDate( new Date() ) } </TableCell>
 			<TableCell sx={{ paddingTop: '5px', paddingBottom: '5px' }} align="center">
 				{/*<IconButton 
 					onClick={() => {
@@ -169,7 +171,9 @@ const Item = props => {
 								<RemoveShoppingCartIcon sx={{ color: 'red' }}/>
 							</IconButton> 
 				}
-
+				<IconButton onClick={() => hide( props._id )}>
+					<DoubleArrowIcon/>
+				</IconButton>
 				{/*<IconButton onClick={() => handleDelete( props._id )}>
 					<DeleteIcon/>
 				</IconButton>*/}
@@ -213,6 +217,15 @@ const Inventory = props => {
 
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+	const handleHide = id => {
+		const hideItem = items[ items.map( item => item._id ).indexOf( id ) ];
+		const newItems = items.filter( item => item._id !== id );
+
+		Cookies.set('defaultValues', JSON.stringify( newItems ));
+		setItems([ ...newItems ]);
+		// setDropDownItems( dropDownItems => [...dropDownItems, hideItem]);
+	}
 
 	const handleAddBox = () => {
 		setOpenAddBox( openAddBox => !openAddBox );
@@ -327,7 +340,7 @@ const Inventory = props => {
 	const buyItem = async ([id, name]) => {
 		const token = Cookies.get('token');
 
-		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/buy-shop-item/${id}`, null, {
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/buy-shop-item/${id}/sold-by/${props.name ?? Cookies.get('uname')}`, null, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}
@@ -397,6 +410,7 @@ const Inventory = props => {
 					buy={buyItem}
 					key={uniqid()}
 					update={getItems}
+					hide={handleHide}
 					// handleUpdate={ updateItem }
 					// handleDelete={ deleteItem }
 					// handleEditBox={ handleEditBox }
@@ -422,7 +436,7 @@ const Inventory = props => {
 
 			index += chunksLimit;
 		}
-		while( chunkSet.length !== Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0) ? 0 : 1 );
+		while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
 
 		setRenderedItems([ ...chunkSet ]);
 	}
@@ -435,7 +449,9 @@ const Inventory = props => {
 	React.useEffect(() => {
 		if( renderedItems.length ){
 			if( page === renderedItems.length && !renderedItems[ renderedItems.length - 1 ].length ){
-				setPage( page => page - 1 );
+				if( page - 1 > 0 ){
+					setPage( page => page - 1 );
+				}
 			}
 		}
 	}, [renderedItems, page]);
@@ -454,12 +470,9 @@ const Inventory = props => {
 					dvs.map( dv => dv.name )
 					.forEach((name, index) => {
 						if( !ddNames.includes( name ) ){
-							console.log('here');
 							newDvs = newDvs.filter((_, index) => index != index );
 						}
 						else{
-							console.log('here2');
-
 							const nameIndex = newDvs.map( item => item.name ).indexOf( name );
 							newDvs[ nameIndex ] = dropDownItems[ ddNames.indexOf( name ) ];
 						}
@@ -572,11 +585,23 @@ const Inventory = props => {
 							</Table>
 						</TableContainer>
 						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
-							<div className="col-2 d-flex flex-row" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>
+							<div className="col-3 d-flex flex-row" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>
 								<b className="p-0 m-0">Total item: </b><p className="p-0 m-0"> { items.length }</p>
 							</div>
-							<div className="col-10 d-flex justify-content-center align-items-center">
+							<div className="col-5 d-flex justify-content-center align-items-center">
 								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+							</div>
+							<div className="col-4 d-flex flex-row" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>
+								<Button 
+									size="small"
+									variant="filled" 
+									onClick={() => {
+										setItems( [] );
+										Cookies.set('defaultValues', JSON.stringify([]));
+									}}
+								>
+									Clear All
+								</Button>
 							</div>
 						</div>
 					</Stack>
@@ -645,13 +670,76 @@ const AddItemBox = props => {
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
+	const [selectedItem, setSelectedItem] = React.useState( null );
+	const [add, setAdd] = React.useState( false );
+	const [options, setOptions] = React.useState( [] );
+
+	const updateItem = async item => {
+		// enqueueSnackbar(`Updating ${item.name}!`);
+
+		const token = Cookies.get('token');
+
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/update-shop-item`, item, {
+			headers: {
+				'authentication': `Bearer ${ token }`
+			}
+		})
+		.then( res => { 
+			// enqueueSnackbar( res.data.message, { variant: 'success' });					
+			// setItems(() => [ ...res.data.items ]);
+			// getItems();
+
+			setItems(items => [...items, item]);
+			setSelectedItem( null );
+			handleAddBox();
+		})
+		.catch( err => {
+			enqueueSnackbar( err?.response?.data?.message ?? 'Error occured, please try again!', { variant: 'error' });					
+			// errorHandler.handle( err, updateItem, 5, null, item );
+		});
+	}
+
+	const handleAdd = () => {
+		updateItem( selectedItem );
+	}
 
 	const handleAddItem = (_, val) => {
-		if( !val ) return;
-
-		Cookies.set('defaultValues', JSON.stringify( val ));
-		setItems( items => [...val] );
+		setSelectedItem( null );
+		setTimeout(() => {
+			setSelectedItem( val );
+		}, 500);
 	}
+
+	React.useEffect(() => {
+		let dv = Cookies.get('defaultValues');
+
+		if( dv && add && selectedItem ){
+			dv = JSON.parse( dv )
+
+			if( dv && defaultValues ){
+				dv = [...defaultValues, selectedItem];
+
+				updateItem( selectedItem );
+				Cookies.set('defaultValues', JSON.stringify( dv ));
+			}
+
+			setAdd( false );
+		}
+		else{
+			if( add && selectedItem ){
+				const newDv = [...defaultValues, selectedItem];
+
+				updateItem( selectedItem );
+				Cookies.set('defaultValues', JSON.stringify( newDv ));
+			}
+
+			setAdd( false );
+		}
+	}, [selectedItem, add]);
+
+	React.useEffect(() => {
+		setOptions( defaultValues && defaultValues.length ? items?.filter?.( i => !defaultValues?.map?.( dv => dv.name )?.includes?.( i.name ) ) : items );
+	}, [defaultValues, items]);
 
 	return(
 		<Dialog
@@ -672,22 +760,22 @@ const AddItemBox = props => {
         <Divider/>
         <div className="col-12 py-2">
 	        <Autocomplete
-			      multiple
 			      id="checkboxes-tags-demo"
-			      options={items}
+			      options={options} // Will only show unselected values
 			      disableCloseOnSelect
-			      defaultValue={defaultValues}
 			      onChange={handleAddItem}
 			      getOptionLabel={(option) => option.name + ' - ' +  option.dateDelivered }
 			      renderOption={(props, option, { selected }) => (
 			        <li {...props}>
-			          <Checkbox
-			            icon={icon}
-			            checkedIcon={checkedIcon}
-			            style={{ marginRight: 8 }}
-			            checked={selected}
-			          />
-			          <p><strong>Name: </strong>{ option.name }, <strong> Date-delivered: </strong> { option.dateDelivered }</p>
+			          {/*
+									<Checkbox
+  			            icon={icon}
+  			            checkedIcon={checkedIcon}
+  			            style={{ marginRight: 8 }}
+  			            checked={selected}
+  			          />
+			          */}
+			          <p className="p-0 m-0"><strong>Name: </strong>{ option.name }, <strong> Date-delivered: </strong> { option.dateDelivered }</p>
 			        </li>
 			      )}
 			      style={{ width: '100%' }}
@@ -696,10 +784,37 @@ const AddItemBox = props => {
 			      )}
 			    />
         </div>
+        <div className="col-12 py-2">
+	        {
+	        	selectedItem
+	        		? <TextField 
+				        	variant="filled" 
+				        	label="Quantity" 
+				        	sx={{ width: '100%' }}
+				        	helperText="Edit its quantity" 
+				        	defaultValue={selectedItem?.quantity}
+				        	onChange={e => {
+				        		if( selectedItem ){
+					        		const newSelectedItem = selectedItem;
+					        		newSelectedItem.quantity = e.target.value;
+
+					        		setSelectedItem(() => newSelectedItem);
+				        		}
+				        	}}
+				        />
+				      : null
+	        }
+        </div>
       </DialogContent>
       
       <DialogActions>
-        <Button onClick={handleAddBox}>
+        <Button onClick={() => setAdd( true )}>
+          Add
+        </Button>
+        <Button onClick={() => {
+        	setSelectedItem( null );
+        	handleAddBox();
+        }}>
           Close
         </Button>
       </DialogActions>

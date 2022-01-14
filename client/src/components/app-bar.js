@@ -124,6 +124,10 @@ const Appbar = props => {
 				{
 					title: 'Item List',
 					onClick: () => setToThisView('/item-list')
+				},
+				{
+					title: 'Transactions',
+					onClick: () => setToThisView('/transactions')
 				}
 		]);
 
@@ -155,6 +159,9 @@ const Appbar = props => {
 
 			case '/accounts':
 				return 'Accounts';
+
+			case '/transactions':
+				return 'Transactions';
 		}
 	}
 
@@ -300,19 +307,35 @@ const Appbar = props => {
 							)
 						: null
 				}
-	      <div 
-	      	className="col-2 d-flex justify-content-end"
-	      >
-		      <h5 
-		      	className="p-2 m-0" 
-		      	style={{ 
-		      		border: '1px solid white',
-		      		width: 'fit-content'
-		      	}}
-		      > 
-		      		{ handleTitle() } 
-		      	</h5>
-	      </div>
+				{
+					windowWidth > 620
+						? <div 
+				      	className="col-2 d-flex justify-content-end"
+				      >
+					      <h5 
+					      	className="p-2 m-0" 
+					      	style={{ 
+					      		border: '1px solid white',
+					      		width: 'fit-content'
+					      	}}
+					      > 
+					      		{ handleTitle() } 
+					      	</h5>
+				      </div>
+		      	: <div 
+				      	className="col-4 d-flex justify-content-center"
+				      >
+					      <h5 
+					      	className="p-2 m-0" 
+					      	style={{ 
+					      		border: '1px solid white',
+					      		width: 'fit-content'
+					      	}}
+					      > 
+					      		{ handleTitle() } 
+					      	</h5>
+				      </div>
+				}
 				{/*<Breadcrumbs
 					color="rgba(255, 255, 255, 0.8)"
 				>

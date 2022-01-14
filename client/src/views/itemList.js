@@ -225,8 +225,8 @@ const Inventory = props => {
 		.then( res => {
 			setItems([ ...res.data.items ]);
 			
-			if (res.data.items.length)
-				enqueueSnackbar( res.data.message, { variant: 'success' });
+			// if (res.data.items.length)
+			// 	enqueueSnackbar( res.data.message, { variant: 'success' });
 		})
 		.catch( err => {
 			errorHandler.handle( err, getItems, 3 );
@@ -390,7 +390,7 @@ const Inventory = props => {
 
 			index += chunksLimit;
 		}
-		while( chunkSet.length !== Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0) ? 0 : 1 );
+		while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
 
 		setRenderedItems([ ...chunkSet ]);
 	}
@@ -403,10 +403,13 @@ const Inventory = props => {
 	React.useEffect(() => {
 		if( renderedItems.length ){
 			if( page === renderedItems.length && !renderedItems[ renderedItems.length - 1 ].length ){
-				setPage( page => page - 1 );
+				if( page - 1 > 0 ){
+					setPage( page => page - 1 );
+				}
 			}
 		}
 	}, [renderedItems, page]);
+
 
 	return(
 		<div 
@@ -621,15 +624,15 @@ const AddItemBox = props => {
 		}));
 	}
 
-	const handleDateReleased = e => {
-		setItem( item => ({
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: e.target.value
-		}));
-	}
+	// const handleDateReleased = e => {
+	// 	setItem( item => ({
+	// 		name: item.name,
+	// 		quantity: item.quantity,
+	// 		srp: item.srp,
+	// 		dateDelivered: item.dateDelivered,
+	// 		dateReleased: e.target.value
+	// 	}));
+	// }
 
 	return(
 		<Dialog
@@ -660,14 +663,14 @@ const AddItemBox = props => {
           	type='date' 
           	helperText="Date delivered"
           />
-          <TextField 
+          {/*<TextField 
           	onChange={handleDateReleased} 
           	onClick={ e => e.target.setAttribute('min', today)}
           	defaultValue={today} 
           	variant="standard" 
           	type='date' 
           	helperText="Date released"
-          />
+          />*/}
 	      </Stack>
       </DialogContent>
       
@@ -786,16 +789,16 @@ const EditItemBox = props => {
 		}));
 	}
 
-	const handleDateReleased = e => {
-		setItem( item => ({
-			_id: selectedItem?._id,
-			name: item.name,
-			quantity: item.quantity,
-			srp: item.srp,
-			dateDelivered: item.dateDelivered,
-			dateReleased: e.target.value
-		}));
-	}
+	// const handleDateReleased = e => {
+	// 	setItem( item => ({
+	// 		_id: selectedItem?._id,
+	// 		name: item.name,
+	// 		quantity: item.quantity,
+	// 		srp: item.srp,
+	// 		dateDelivered: item.dateDelivered,
+	// 		dateReleased: e.target.value
+	// 	}));
+	// }
 
 	return(
 		<Dialog
@@ -824,6 +827,7 @@ const EditItemBox = props => {
 		          />
 		          
 		          <TextField 
+			          disabled
 		          	onChange={handleCount} 
 		          	defaultValue={selectedItem?.quantity} 
 		          	autoFocus 
@@ -832,7 +836,6 @@ const EditItemBox = props => {
 		          />
 		          
 		          <TextField 
-		          	disabled
 		          	onChange={handleSrp} 
 		          	defaultValue={selectedItem?.srp} 
 		          	variant="filled" 
@@ -848,13 +851,13 @@ const EditItemBox = props => {
 		          	helperText="Date delivered"
 		          />
 
-		          <TextField 
+		          {/*<TextField 
 		          	onChange={handleDateReleased} 
 		          	defaultValue={renderDate(selectedItem?.dateReleased)} 
 		          	variant="standard" 
 		          	type='date' 
 		          	helperText="Date released"
-		          />
+		          />*/}
 		      </Stack>
 	        </DialogContent>
 	        
@@ -872,7 +875,6 @@ const EditItemBox = props => {
 									) return enqueueSnackbar('All fields are required', { variant: 'error' });
 	          		
 	          		handleEditBox();
-		          	console.log( item );
 	          		editItem( item );
 	          	}} 
 	          	autoFocus

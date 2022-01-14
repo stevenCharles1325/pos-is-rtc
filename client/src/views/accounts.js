@@ -273,8 +273,6 @@ const ItemBox = props => {
 		number: selectedItem?.number ?? '',
 	}
 
-	const [user, setUser] = React.useState({ password: '', showPassword: false });
-
 	const handleClickShowPassword = () => {
 		setShowPassword( showPassword => !showPassword );
 	};
@@ -419,7 +417,7 @@ const ItemBox = props => {
 						id="sign-in-pass" 
 						variant="filled" 
 						type={ showPassword ? "text" : "password" }
-						value={ item.password } 
+						defaultValue={ item.password } 
 						onChange={e => dispatch({ type: 'password', data: e.target.value })} 
 						endAdornment={
 			              <InputAdornment position="end">
