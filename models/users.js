@@ -10,7 +10,8 @@ const userSchema = new Schema({
 	email: { type: String },
 	number: { type: String },
 	username: { type: String, required: true },
-	password: { type: String, required: true }
+	password: { type: String, required: true },
+	status: { type: String, default: 'activated' }
 });
 
 const User = mongoose.model('Users', userSchema);

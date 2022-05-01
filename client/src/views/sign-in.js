@@ -15,6 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 
+
 const Signin = props => {
 	const { 
 		validator, 
@@ -65,7 +66,7 @@ const Signin = props => {
 			setToThisView('/dashboard');
 		})
 		.catch( err => {
-			if( err?.response?.status === 403 ){
+			if( err?.response?.status === 403 || err?.response?.status === 401 ){
 				setErrMsg( err?.response?.data?.message );
 			}
 			else{
@@ -104,6 +105,7 @@ const Signin = props => {
 					</Alert> 
 					: null
 			}
+			<img width="150" height="150" className="logo" src="/images/logo22.jpg" alt="logo of ROT"/>
 			<div className="d-flex justify-content-center">
 				<Typography 
 					variant="h3" 

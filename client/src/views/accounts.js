@@ -41,13 +41,18 @@ import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+
 const Item = props => {
 	const {
 		setSelectedItem,
 		handleItemBox,
 		handleUpdate,
 		handleDelete,
-		update
+		update,
+		handleStatus
 	} = props;
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -82,9 +87,15 @@ const Item = props => {
 					>
 						<EditIcon/>
 					</IconButton>
-					<IconButton onClick={() => handleDelete( props._id )}>
+					{/*<IconButton onClick={() => handleDelete( props._id )}>
 						<DeleteIcon/>
-					</IconButton>
+					</IconButton>*/}
+					<FormGroup>
+				      <FormControlLabel 
+				      		control={<Switch checked={props.status === 'activated' ? true : false} onDoubleClick={e => e.stopPropagation()} onChange={() => handleStatus( props._id )} />} 
+				      		label={ props.status === 'activated' ? 'Activated' : 'Deactivated'} 
+				      	/>
+				    </FormGroup>
 				</Stack>
 			</TableCell>
 		</TableRow>
@@ -154,6 +165,23 @@ const Accounts = props => {
 		});
 	}
 
+	const handleStatus = async id => {
+		const token = Cookies.get('token');
+
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/user-status/id/${id}`, null, {
+			headers: {
+				'authentication': `Bearer ${ token }`
+			}
+		})
+		.then(() => {
+			handleFetchNonAdminAccounts();
+		})
+		.catch( err => {
+			throw err;
+			// props.errorHandler.handle( err, updateItem, 21, null, id );
+		});
+	}
+
 	const handleDelete = async id => {
 		const token = Cookies.get('token');
 
@@ -180,6 +208,7 @@ const Accounts = props => {
 				<Item
 					{ ...acc }
 					key={uniqid()}
+					handleStatus={handleStatus}
 					handleUpdate={updateItem}
 					handleDelete={handleDelete}
 					handleItemBox={handleItemBox}
