@@ -57,6 +57,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 import Pagination from '@mui/material/Pagination';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -165,14 +167,14 @@ const Item = props => {
 				{
 					count > 0
 						? <IconButton onClick={() => handleBuy()}>
-								<ShoppingCartIcon/>
+								<RemoveCircleIcon/>
 							</IconButton>
 						: <IconButton disabled>
 								<RemoveShoppingCartIcon sx={{ color: 'red' }}/>
 							</IconButton> 
 				}
 				<IconButton onClick={() => hide( props._id )}>
-					<DoubleArrowIcon/>
+					<CancelPresentationIcon/>
 				</IconButton>
 				{/*<IconButton onClick={() => handleDelete( props._id )}>
 					<DeleteIcon/>
@@ -197,6 +199,83 @@ const Item = props => {
 }
 
 
+const TransactionDialog = props => {
+	const { 
+		open, 
+		handleClose, 
+		transactionItem,
+		dropDownItems,
+		setDropDownItems,
+	} = props;
+	const { enqueueSnackbar } = useSnackbar();
+	
+
+  const handleBuy = () => {
+  	const token = Cookies.get('token');
+
+		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/buy-shop-item/${transactionItem[ 0 ]}/sold-by/${transactionItem[ 1 ] ?? Cookies.get('uname')}`, null, {
+			headers: {
+				'authentication': `Bearer ${ token }`
+			}
+		})
+		.then( res => {
+			let newDropDownItems = [...dropDownItems].map( item => {
+				if( item._id === transactionItem[ 0 ] ){
+					item.quantity -= 1;
+				}
+
+				return item;
+			});
+
+			setDropDownItems([ ...newDropDownItems ]);
+			// debounce(getItems, 3000)();
+			enqueueSnackbar(`Successfully sold 1 ${ transactionItem[ 1 ] }`, { variant: 'success' });
+		})
+		.catch( err => {
+			// errorHandler.handle( err, handleBuy, 7, null, transactionItem );
+		});	
+  }
+
+  return (
+	  <Dialog open={open} onClose={handleClose}>
+	    <DialogTitle>Transaction</DialogTitle>
+	    <DialogContent>
+	      <DialogContentText>
+	        To continue the process please fill up this form.
+	      </DialogContentText>
+	      <TextField
+	        autoFocus
+	        margin="dense"
+	        id="name"
+	        label="Name of client"
+	        fullWidth
+	        variant="standard"
+	      />
+	      <TextField
+	        margin="dense"
+	        id="name"
+	        label="Cash payment"
+	        fullWidth
+	        variant="standard"
+	      />
+	      <TextField
+	        margin="dense"
+	        id="name"
+	        label="Change"
+	        fullWidth
+	        variant="standard"
+	      />
+	    </DialogContent>
+	    <DialogActions>
+	      <Button onClick={handleClose}>Cancel</Button>
+	      <Button onClick={handleBuy}>Buy</Button>
+	    </DialogActions>
+	  </Dialog>
+  );
+}
+
+
+
 const Inventory = props => {
 	const chunksLimit = 7;
 	const [page, setPage] = React.useState( 1 );
@@ -214,6 +293,8 @@ const Inventory = props => {
 	const [filteredItems, setFilteredItems] = React.useState( null );
 	const [selectedItem, setSelectedItem] = React.useState( null );
 	const [dropDownItems, setDropDownItems] = React.useState( [] );
+	const [openTransaction, setOpenTransaction] = React.useState( false );
+	const [transactionItem, setTransactionItem] = React.useState( null );
 
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -338,6 +419,9 @@ const Inventory = props => {
 	// }
 
 	const buyItem = async ([id, name]) => {
+		// setTransactionItem([ id, name ]);
+		// setOpenTransaction( true );
+
 		const token = Cookies.get('token');
 
 		axios.put(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/buy-shop-item/${id}/sold-by/${props.name ?? Cookies.get('uname')}`, null, {
@@ -637,6 +721,13 @@ const Inventory = props => {
 		        ))
 	    }
     	</SpeedDial>*/}
+    	{/*<TransactionDialog 
+    		transactionItem={transactionItem} 
+    		open={openTransaction}
+    		setDropDownItems={setDropDownItems}
+    		dropDownItems={dropDownItems}
+    		handleClose={() => setOpenTransaction( false )}
+    	/>*/}
     	<AddItemBox 
     		// update={getItems}
       	// addItem={addItem}

@@ -49,19 +49,24 @@ router.post('/sign-in', async (req, res, next) => {
     if( err ) return res.sendStatus( 500 );
 
     if( doc ){
-      const user = { name: username, role: doc.role };
-      const accessToken = requestAccessToken( user );
-      const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
+      if( doc.status === 'deactivated' ){
+        return res.status( 401 ).json({ message: 'This user is deactivated' });
+      }
+      else{
+        const user = { name: username, role: doc.role };
+        const accessToken = requestAccessToken( user );
+        const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
 
-      Token.create({ code: refreshToken }, err => {
-        if( err ) return res.sendStatus( 500 );
+        Token.create({ code: refreshToken }, err => {
+          if( err ) return res.sendStatus( 500 );
 
-        return res.json({
-          message: `Welcome ${ username }!`,
-          accessToken,
-          refreshToken
+          return res.json({
+            message: `Welcome ${ username }!`,
+            accessToken,
+            refreshToken
+          });
         });
-      });
+      }
     }
     else{
       return res.status( 403 ).json({
@@ -269,6 +274,24 @@ router.delete('/delete-shop-item/:id', authentication, async ( req, res ) => {
   });
 });
 
+router.put('/user-status/id/:id', async( req, res ) => {
+    User.findOne({ _id: req.params.id }, (err, doc) => {
+      if( err ) return res.sendStatus( 503 );
+
+      if( doc ){
+        doc.status = doc.status === 'activated' ? 'deactivated' : 'activated';
+
+        doc.save( err => {
+          if( err ) return res.sendStatus( 503 );
+
+          res.sendStatus( 200 );
+        });
+      }
+      else{
+        return res.sendStatus( 404 );
+      }
+    });
+});
 
 router.put('/buy-shop-item/:id/sold-by/:username', authentication, async ( req, res ) => {
   const { id } = req.params;
@@ -289,6 +312,7 @@ router.put('/buy-shop-item/:id/sold-by/:username', authentication, async ( req, 
         if( err ) return res.sendStatus( 503 );
 
         if( data ){
+          console.log( data[ month.toLowerCase() ]);
           data[ month.toLowerCase() ] += 1;
 
           data.save( err => {
@@ -357,15 +381,15 @@ router.get('/export-record', async (req, res, next) => {
       });
     }
 
-    Item.find({}, (err, doc) => {
+    // heyy
+    TransactionList.find({}, (err, doc) => {
       if( err ) return res.status( 503 ).json({ message: err });
 
       const json = doc.map( elem => ({
-        name: elem.name,
-        quantity: elem.quantity,
+        soldBy: elem.soldBy,
+        itemName: elem.itemName,
         srp: elem.srp,
-        dateDelivered: renderDate( elem.dateDelivered ),
-        dateReleased: renderDate( elem.dateReleased )
+        date: renderDate( elem.date ),
       }));
 
       const xls = json2xls(json);

@@ -179,6 +179,7 @@ const Inventory = props => {
 	const [renderedItems, setRenderedItems] = React.useState( [] );
 	const [records, setRecords] = React.useState( [] );
 	const [years, setYears] = React.useState( {} );
+	const [totalCash, setTotalCash] = React.useState( 0 );
 
 	// const [filteredItems, setFilteredItems] = React.useState( null );
 	// const [selectedItem, setSelectedItem] = React.useState( null );
@@ -235,6 +236,12 @@ const Inventory = props => {
 			));
 		}
 
+		items.forEach( item => {
+			if( new Date( item.date ).toString().split(' ').slice(0, 4).join(' ') === new Date().toString().split(' ').slice(0, 4).join(' ')  ){
+				setTotalCash( totalCash => totalCash + item.srp );
+			}
+		});
+
 		const sortedItems = [ ...items ];
 		sortedItems.sort((item1, item2) => new Date( item1.date ) - new Date( item2.date ));	
 
@@ -273,24 +280,23 @@ const Inventory = props => {
 	}, [renderedItems, page]);
 
 	React.useEffect(() => {
-		console.log( items );	
-		items?.forEach?.( item => {
-				if( years?.[ item.year ] ){
-					let index = monthIndices[ item.month ];
-						
-					console.log( 'here' );
-					console.log( index );
-					years[ item.year ][ index ] += 1;
-				}
-				else{
-					const year = item.year;
+		if( items.length ){
+			items?.forEach?.( item => {
+					if( years?.[ item.year ] ){
+						let index = monthIndices[ item.month ];
+							
+						years[ item.year ][ index ] += 1;
+					}
+					else{
+						const year = item.year;
 
-					const newYearsRecord = { ...years };
-					newYearsRecord[ year ] = Array( 12 ).fill( 0 )
+						const newYearsRecord = { ...years };
+						newYearsRecord[ year ] = Array( 12 ).fill( 0 )
 
-					setYears({ ...newYearsRecord });
-				}						
-		});
+						setYears(() => ({ ...newYearsRecord }));
+					}						
+			});
+		}
 	}, [items, years]);
 
 	React.useEffect(() => {
@@ -301,13 +307,15 @@ const Inventory = props => {
 				const yrList = [];
 				let chunkSet = [];
 
+				yearKeys.reverse();
+
 				yearKeys.forEach( yr => {
 					yrList.push(
 								<Item2
 									key={uniqid()}
 									year={ yr }
-									month={ [...years[ yr ]] }
-									total={ years[ yr ].reduce((val, accum) => val + accum) }
+									month={ [...years[ yr ].map( datum => Math.floor(datum))] }
+									total={ Math.floor(years[ yr ].reduce((val, accum) => val + accum)) }
 								/>
 						);
 				});
@@ -322,7 +330,7 @@ const Inventory = props => {
 				}
 				while( chunkSet.length < Math.floor( yrList.length / chunksLimit ) + (yrList % chunksLimit === 0 ? 0 : 1 ));
 
-				setRecords([ ...chunkSet	]);
+				setRecords(() => [ ...chunkSet ]);
 			}		
 	}, [years]);
 
@@ -400,6 +408,9 @@ const Inventory = props => {
 							</Table>
 						</TableContainer>
 						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
+							<div className="col-4 d-flex justify-content-center align-items-center">
+									<p>Total Cash Today: { totalCash }</p>
+							</div>
 							<div className="col-8 d-flex justify-content-center align-items-center">
 								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
 							</div>

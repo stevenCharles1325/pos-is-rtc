@@ -36,3 +36,8 @@
     width: 300px !important;
   }
 }
+
+
+.logo{
+  mix-blend-mode: multiply;
+}
