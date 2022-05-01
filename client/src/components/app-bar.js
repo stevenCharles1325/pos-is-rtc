@@ -261,7 +261,12 @@ const Appbar = props => {
 					color: 'white',
 				}}
 			>
-				<div className="col-1">
+				<div 
+					style={{
+						width: 'fit-content'
+					}}
+					className="d-flex justify-content-between align-items-center"
+				>
 					<IconButton
 						size="large"
 						edge="start"
@@ -272,6 +277,11 @@ const Appbar = props => {
 					>
 						<MenuIcon />
 					</IconButton>
+					{
+		      	windowWidth > 700
+		      		? <img width="200px" src="/images/unnamed.png" className="pt-3"/>
+		      		: null
+		      }
 				</div>
 				<Drawer
           anchor="left"
@@ -280,13 +290,7 @@ const Appbar = props => {
         >
 	          { list() }
 	      </Drawer>
-	      {
-	      	windowWidth > 450
-	      		? <div className="col-3">
-					      <h5 className="text-uppercase m-0 p-0" > rodmar telecom </h5>
-				      </div>
-				    : null
-	      }
+	      
 	      {
 					windowWidth > 620 && (window.location.pathname.includes('inventory') || window.location.pathname.includes('item-list'))
 						? (
@@ -307,10 +311,13 @@ const Appbar = props => {
 							)
 						: null
 				}
-				{
+				{/*{
 					windowWidth > 620
 						? <div 
-				      	className="col-2 d-flex justify-content-end"
+								style={{
+									width: 'fit-content'
+								}}
+				      	className="d-flex justify-content-end"
 				      >
 					      <h5 
 					      	className="p-2 m-0" 
@@ -335,7 +342,7 @@ const Appbar = props => {
 					      		{ handleTitle() } 
 					      	</h5>
 				      </div>
-				}
+				}*/}
 				{/*<Breadcrumbs
 					color="rgba(255, 255, 255, 0.8)"
 				>
@@ -371,7 +378,29 @@ const Appbar = props => {
         >
             { list() }
         </Drawer>*/}
-				<div className="col-2">
+				<div
+					style={{
+						width: 'fit-content'
+					}}
+					className="col-3 d-flex justify-content-between align-items-center"
+				>
+					<div 
+						style={{
+							width: 'fit-content',
+							height: '45px'
+						}}
+		      	className="d-flex justify-content-end"
+		      >
+			      <h5 
+			      	className="p-2 m-0" 
+			      	style={{ 
+			      		border: '1px solid white',
+			      		width: 'fit-content'
+			      	}}
+			      > 
+			      		{ handleTitle() } 
+			      	</h5>
+		      </div>
 					<IconButton
 						size="large"
 						color="inherit"

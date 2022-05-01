@@ -209,7 +209,7 @@ const Accounts = props => {
 	}, [props.tools.role]);
 
 	return(
-		<div style={{ width: '100%', height: '100%', padding: '100px 10px 10px 10px' }} className="d-flex justify-content-center align-items-start">
+		<div style={{ width: '100%', height: '100%', padding: '100px 10px 10px 10px', backgroundColor:'#708090' }} className="d-flex justify-content-center align-items-start">
 			<TableContainer component={Paper} sx={{ width: 900 }}>
 				<Table>
 					<TableHead>
