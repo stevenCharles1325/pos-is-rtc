@@ -117,13 +117,14 @@ const Appbar = props => {
 	const [viewList, setViewList] = React.useState([{
 					title: 'Dashboard',
 					onClick: () => setToThisView('/dashboard')
-				},{
-					title: 'Inventory',
-					onClick: () => setToThisView('/inventory')
 				},
 				{
 					title: 'Item List',
 					onClick: () => setToThisView('/item-list')
+				},
+				{
+					title: 'Inventory',
+					onClick: () => setToThisView('/inventory')
 				},
 				{
 					title: 'Reports',
@@ -249,7 +250,7 @@ const Appbar = props => {
 		<AppBar
 			sx={{
 				padding: '0 20px 0px 20px',
-				bgcolor: '#000000',
+				bgcolor: '#ffe8a9',
 			}}
 		>
 			<Stack 
@@ -275,7 +276,7 @@ const Appbar = props => {
 						sx={{ mr: 2 }}
 						onClick={() => setDrawer( true )}
 					>
-						<MenuIcon />
+						<MenuIcon sx={{ color:"black" }} />
 					</IconButton>
 					{
 		      	windowWidth > 700
@@ -297,10 +298,10 @@ const Appbar = props => {
 					      <div className="col-4">
 									<Search>
 					          <SearchIconWrapper>
-					            <SearchIcon />
+					            <SearchIcon sx={{ color: 'black' }}/>
 					          </SearchIconWrapper>
 					          <StyledInputBase
-					        		sx={{ width: '100%' }}
+					        		sx={{ width: '100%', color: 'black' }}
 						          value={search} 
 						          onChange={handleSearch}
 					            placeholder="Search item"
@@ -392,10 +393,11 @@ const Appbar = props => {
 		      	className="d-flex justify-content-end"
 		      >
 			      <h5 
-			      	className="p-2 m-0" 
+			      	className="p-2 m-0 px-3" 
 			      	style={{ 
-			      		border: '1px solid white',
-			      		width: 'fit-content'
+			      		border: '1px solid rgba(0, 0, 0, 0.5)',
+			      		width: 'fit-content',
+			      		color: 'rgba(0, 0, 0, 0.8)'
 			      	}}
 			      > 
 			      		{ handleTitle() } 

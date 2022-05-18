@@ -91,7 +91,7 @@ const Dashboard = props => {
 				paddingTop: '15vh',
 				overflowY: 'auto',
 				overflowX: 'hidden',
-				backgroundColor:'#708090'
+				backgroundColor:'transparent'
 			}}
 			className="row d-flex justify-content-around align-items-center"
 		>	

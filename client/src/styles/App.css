@@ -1,5 +1,5 @@
 .App {
-  background-image: linear-gradient(250.39deg, #ECD975 23.16%, rgba(206, 163, 51, 0.58) 85.78%);
+  background-color: #dadbdb;
   /*background-image: url('../images/heart1.jpg');
   background-position: center;
   background-repeat: no-repeat;
@@ -29,6 +29,8 @@
 .sign-in, .sign-up{
   width: 100%;
   height: 100%;
+  color:  white;
+  background-color: #ffe8a9;
 }
 
 @media (max-width: 1075px) {

@@ -105,19 +105,18 @@ const Signin = props => {
 					</Alert> 
 					: null
 			}
-			<img width="150" height="150" className="logo" src="/images/logo22.jpg" alt="logo of ROT"/>
+			<img width="50%"  className="logo" src="/images/unnamed.png" alt="logo of ROT"/>
 			<div className="d-flex justify-content-center">
-				<Typography 
+				{/*<Typography 
 					variant="h3" 
 					sx={{ 
-						color: '#000000',
+						color: 'black',
 						fontFamily: 'Poppins',
 						letterSpacing: '5px',
-						
 					}}
 				>
 					SIGN-IN
-				</Typography>
+				</Typography>*/}
 			</div>
 			<br/>
 			<div 
@@ -155,8 +154,8 @@ const Signin = props => {
 					<Button 
 						onClick={() => setSigningIn( true )} 
 						disabled={ btnMsg === 'loading' ? true : false } 
-						sx={{borderColor: 'black', color: 'white'}} 
-						variant="outlined"
+						sx={{backgroundColor: '#01487e', color: 'white', fontWeight: 'bold' }} 
+						variant="contained"
 					> 
 						{ btnMsg } 
 					</Button>
