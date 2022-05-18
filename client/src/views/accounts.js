@@ -310,6 +310,19 @@ const ItemBox = props => {
 		event.preventDefault();
 	};
 
+	// const handleContactNumber = e => {
+	// 	const reg = new RegExp('^[0-9]*$');
+	// 	const value = e.target.value;
+
+	// 	console.log( value );
+	// 	if(!reg.test( value )){
+	// 		dispatch({ type: 'number', data: value.replace(/[^0-9]/g, '') });
+	// 	}
+	// 	else{
+	// 		;
+	// 	}
+	// }
+
 	const reducer = (state, action) => {
 		switch( action.type ){
 			case 'username':
@@ -348,11 +361,50 @@ const ItemBox = props => {
 	const [item, dispatch] = React.useReducer(reducer, userObject);
 	const [showPassword, setShowPassword] = React.useState( false );
 
+	const isEmailValid = () => {
+		const validMailServers = ['gmail', 'yahoo', 'email'].map( mailServer => `${mailServer}.com` );
+		const splittedEmail = item.email.split('@');
+
+		const isEmailInputedEmpty = !!!splittedEmail; 
+
+		if( isEmailInputedEmpty ) return false;
+
+		const emailUname = splittedEmail?.[ 0 ];
+		const emailMailServer = splittedEmail?.[ 1 ];
+
+		const isEmailUnameEmpty = !!!emailUname;
+		const isEmailUnameHaveSpaces = emailUname.includes(' ');
+
+		if( isEmailUnameEmpty || isEmailUnameHaveSpaces ) return false;
+
+		if(!validMailServers.includes( emailMailServer )) return false;
+
+		return true;
+	}
+
+	const areAllFieldsFilled = ( doShift = false ) => {
+		const itemVal = Object.values( item );
+
+		if( doShift ) itemVal.shift();
+		for( let val of itemVal ){
+			if( !val.length ) return false;
+		}
+
+		return true;
+	}
+
+	const isPasswordLengthGood = () => {
+		if( item.password.length >= 8 ){
+			return true;
+		}
+
+		return false;
+	}
+
 	React.useEffect(() => {
 		if( props?.selectedItem ){
 			const data = props?.selectedItem;
 
-			console.log( data );
 			dispatch({ type: 'username', data: data.username });
 			dispatch({ type: 'password', data: data.password });
 			dispatch({ type: 'firstName', data: data.firstName });
@@ -426,8 +478,8 @@ const ItemBox = props => {
 
   		          <TextField 
 		          	onChange={e => dispatch({ type: 'number', data: e.target.value })} 
-		          	defaultValue={item.number} 
-		          	autoFocus 
+		          	defaultValue={item.number}
+		          	type="number"
 		          	variant="filled" 
 		          	label="Contact Number"
 		          />
@@ -479,9 +531,16 @@ const ItemBox = props => {
 	          		? (
 						<Button 
 				          	onClick={() => {
-				          		if( !item.username || !item.password ) 
-				          			return enqueueSnackbar('Username and Password are required', { variant: 'error' });
-				          		
+				          		if( !areAllFieldsFilled() ) {
+				          			return enqueueSnackbar('All fields are required', { variant: 'error' });
+				          		}
+				          		else if( !isPasswordLengthGood() ){
+				          			return enqueueSnackbar('Password must at least 8 character', { variant: 'error' });
+				          		}
+				          		else if( !isEmailValid() ){
+				          			return enqueueSnackbar('Email is invalid', { variant: 'error' });
+				          		}
+
 				          		handleItemBox();
 				          		editItem( item );
 				          	}} 
@@ -493,9 +552,16 @@ const ItemBox = props => {
           			: (
           				<Button 
 				          	onClick={() => {
-				          		if( !item.username || !item.password ) 
-				          			return enqueueSnackbar('Username and Password are required', { variant: 'error' });
-				          		
+				          		if( !areAllFieldsFilled( true ) ) {
+				          			return enqueueSnackbar('All fields are required', { variant: 'error' });
+				          		}
+				          		else if( !isPasswordLengthGood() ){
+				          			return enqueueSnackbar('Password must at least 8 character', { variant: 'error' });
+				          		}
+				          		else if( !isEmailValid() ){
+				          			return enqueueSnackbar('Email is invalid', { variant: 'error' });
+				          		}
+
 				          		const { 
 				          			username,
 				          			password,

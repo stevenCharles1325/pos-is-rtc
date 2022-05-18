@@ -711,27 +711,25 @@ const EditItemBox = props => {
 
 	const { enqueueSnackbar } = useSnackbar();
 
-	const [item, setItem] = React.useState({
-		_id: '',
-		name: '',
-		quantity: '',
-		srp: '',
-		dateDelivered: '',
-		dateReleased: '' 
-	});
+	const data = React.useMemo(() => selectedItem, [selectedItem]);
 
-	React.useEffect(() => {
-		if( selectedItem ){
-			setItem({
-				_id: selectedItem?._id,
-				name: selectedItem?.name,
-				quantity: selectedItem?.quantity,
-				srp: selectedItem?.srp,
-				dateDelivered: selectedItem?.dateDelivered,
-				dateReleased: selectedItem?.dateReleased
-			});
-		}
-	}, [selectedItem]);
+	const [item, setItem] = React.useState( {} );
+
+	// React.useEffect(() => {
+	// 	if( selectedItem ){
+	// 		console.log( selectedItem );
+	// 		setItem({
+	// 			_id: selectedItem?._id,
+	// 			name: selectedItem?.name,
+	// 			quantity: selectedItem?.quantity,
+	// 			srp: selectedItem?.srp,
+	// 			dateDelivered: selectedItem?.dateDelivered,
+	// 			dateReleased: selectedItem?.dateReleased
+	// 		});
+	// 	}
+	// }, [selectedItem]);
+
+	React.useEffect(() => setItem(() => ({ ...data })), [data]);
 
 	const handleName = e => {
 		setItem( item => ({
@@ -820,7 +818,7 @@ const EditItemBox = props => {
 	          <Stack spacing={5}>
 		          <TextField 
 		          	onChange={handleName} 
-		          	defaultValue={selectedItem?.name} 
+		          	value={item?.name} 
 		          	autoFocus 
 		          	variant="filled" 
 		          	label="Item name"
@@ -829,7 +827,7 @@ const EditItemBox = props => {
 		          <TextField 
 			          disabled
 		          	onChange={handleCount} 
-		          	defaultValue={selectedItem?.quantity} 
+		          	value={item?.quantity} 
 		          	autoFocus 
 		          	variant="filled" 
 		          	label="Item quantity"
@@ -837,7 +835,7 @@ const EditItemBox = props => {
 		          
 		          <TextField 
 		          	onChange={handleSrp} 
-		          	defaultValue={selectedItem?.srp} 
+		          	value={item?.srp} 
 		          	variant="filled" 
 		          	type="number" 
 		          	label="Item price"
@@ -845,7 +843,7 @@ const EditItemBox = props => {
 		          
 		          <TextField 
 		          	onChange={handleDateDelivered} 
-		          	defaultValue={renderDate(selectedItem?.dateDelivered)} 
+		          	value={renderDate(item?.dateDelivered)} 
 		          	variant="standard" 
 		          	type='date' 
 		          	helperText="Date delivered"
@@ -891,7 +889,7 @@ const renderDate = date => {
 
 	const _parsedDate = new Date( date );
 	const _date = _parsedDate.getDate();
-	const _month = _parsedDate.getMonth() + 1;
+	const _month = (_parsedDate.getMonth() + 1).toString().padStart( 2, '0' );
 	const _year = _parsedDate.getFullYear();
 
 	return `${_year}-${_month}-${_date}`;

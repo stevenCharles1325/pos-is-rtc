@@ -170,7 +170,7 @@ const Appbar = props => {
 		setAnchorEl( null );
 
 		const token = Cookies.get('token');
-		axios.delete('http://localhost:3500/sign-out', {
+		axios.delete(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/sign-out`, {
 			headers: {
 				'authentication': `Bearer ${ token }`
 			}

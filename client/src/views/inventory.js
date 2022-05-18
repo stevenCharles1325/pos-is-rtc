@@ -166,16 +166,26 @@ const Item = props => {
 
 				{
 					count > 0
-						? <IconButton onClick={() => handleBuy()}>
-								<RemoveCircleIcon/>
-							</IconButton>
-						: <IconButton disabled>
-								<RemoveShoppingCartIcon sx={{ color: 'red' }}/>
-							</IconButton> 
+						? <Tooltip title="Release" arrow> 
+								<span> 
+									<IconButton onClick={() => handleBuy()}>
+										<RemoveCircleIcon/>
+									</IconButton>
+								</span>
+							</Tooltip>
+						: <Tooltip title="Release" arrow> 
+								<span> 
+									<IconButton disabled>
+										<RemoveShoppingCartIcon sx={{ color: 'red' }}/>
+									</IconButton> 
+								</span>
+							</Tooltip>
 				}
-				<IconButton onClick={() => hide( props._id )}>
-					<CancelPresentationIcon/>
-				</IconButton>
+				<Tooltip title="Hide" arrow>
+					<IconButton onClick={() => hide( props._id )}>
+						<CancelPresentationIcon/>
+					</IconButton>
+				</Tooltip>
 				{/*<IconButton onClick={() => handleDelete( props._id )}>
 					<DeleteIcon/>
 				</IconButton>*/}

@@ -87,6 +87,10 @@ const Signin = props => {
 			setErrMsg('Either username or password is empty!');
 			setSigningIn( false );
 		}
+		// else if( signingIn && user.password.length < 8 ){
+		// 	setErrMsg('Password must be at least 8 characters');
+		// 	setSigningIn( false );	
+		// }
 
 	}, [user, signingIn]);
 
