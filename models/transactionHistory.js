@@ -10,7 +10,6 @@ const transactionListScheme = new Schema({
 	month	: 	{ type: String, required: true },
 });
 
-
 const TransactionList = new mongoose.model('TransactionLists', transactionListScheme);
 
 module.exports = TransactionList;

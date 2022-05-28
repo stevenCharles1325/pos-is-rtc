@@ -168,7 +168,7 @@ const Item = props => {
 					count > 0
 						? <Tooltip title="Release" arrow> 
 								<span> 
-									<IconButton onClick={() => handleBuy()}>
+									<IconButton onClick={() => handleBuy()} disabled={props?.role !== 'normal'}>
 										<RemoveCircleIcon/>
 									</IconButton>
 								</span>
@@ -181,11 +181,11 @@ const Item = props => {
 								</span>
 							</Tooltip>
 				}
-				<Tooltip title="Hide" arrow>
+				{/*<Tooltip title="Hide" arrow>
 					<IconButton onClick={() => hide( props._id )}>
 						<CancelPresentationIcon/>
 					</IconButton>
-				</Tooltip>
+				</Tooltip>*/}
 				{/*<IconButton onClick={() => handleDelete( props._id )}>
 					<DeleteIcon/>
 				</IconButton>*/}
@@ -505,6 +505,7 @@ const Inventory = props => {
 					key={uniqid()}
 					update={getItems}
 					hide={handleHide}
+					role={props?.tools?.role}
 					// handleUpdate={ updateItem }
 					// handleDelete={ deleteItem }
 					// handleEditBox={ handleEditBox }
@@ -535,9 +536,9 @@ const Inventory = props => {
 		setRenderedItems([ ...chunkSet ]);
 	}
 
-	const memoizedFiltering = React.useCallback(() => handleSearching(), [search, items]);
+	const memoizedFiltering = React.useCallback(() => handleSearching(), [search, items, props]);
 
-	React.useEffect(() => memoizedFiltering(), [search, items]);
+	React.useEffect(() => memoizedFiltering(), [search, items, props]);
 	React.useEffect(() => getItems(), []);
 
 	React.useEffect(() => {
@@ -551,33 +552,34 @@ const Inventory = props => {
 	}, [renderedItems, page]);
 
 	React.useEffect(() => {
-		if( dropDownItems && dropDownItems.length ){
-			let dvs =  Cookies.get('defaultValues');
+		// if( dropDownItems && dropDownItems.length ){
+		// 	let dvs =  Cookies.get('defaultValues');
 
-			if( dvs ){
-				dvs = JSON.parse( dvs );
-				let newDvs = dvs ?? [];
+		// 	if( dvs ){
+		// 		dvs = JSON.parse( dvs );
+		// 		let newDvs = dvs ?? [];
 				
-				if( dvs && dvs.length ){
-					const ddNames = dropDownItems.map(item => item.name );
+		// 		if( dvs && dvs.length ){
+		// 			const ddNames = dropDownItems.map(item => item.name );
 
-					dvs.map( dv => dv.name )
-					.forEach((name, index) => {
-						if( !ddNames.includes( name ) ){
-							newDvs = newDvs.filter((_, index) => index != index );
-						}
-						else{
-							const nameIndex = newDvs.map( item => item.name ).indexOf( name );
-							newDvs[ nameIndex ] = dropDownItems[ ddNames.indexOf( name ) ];
-						}
-					});
+		// 			dvs.map( dv => dv.name )
+		// 			.forEach((name, index) => {
+		// 				if( !ddNames.includes( name ) ){
+		// 					newDvs = newDvs.filter((_, index) => index != index );
+		// 				}
+		// 				else{
+		// 					const nameIndex = newDvs.map( item => item.name ).indexOf( name );
+		// 					newDvs[ nameIndex ] = dropDownItems[ ddNames.indexOf( name ) ];
+		// 				}
+		// 			});
 
-					Cookies.set('defaultValues', JSON.stringify( newDvs ));	
-				}
+		// 			Cookies.set('defaultValues', JSON.stringify( newDvs ));	
+		// 		}
 
-				if( newDvs && newDvs.length ) setItems([ ...newDvs ]);
-			}
-		}
+		// 		if( newDvs && newDvs.length ) setItems([ ...newDvs ]);
+		// 	}
+		// }
+		setItems([ ...dropDownItems ]);
 	}, [dropDownItems]);
 
 	return(
@@ -686,7 +688,7 @@ const Inventory = props => {
 								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
 							</div>
 							<div className="col-4 d-flex flex-row" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>
-								<Button 
+								{/*<Button 
 									size="small"
 									variant="filled" 
 									onClick={() => {
@@ -695,13 +697,13 @@ const Inventory = props => {
 									}}
 								>
 									Clear All
-								</Button>
+								</Button>*/}
 							</div>
 						</div>
 					</Stack>
 				</Paper>
 			</div>
-			<div
+			{/*<div
 				style={{
 					position: 'absolute',
 					bottom: '3%',
@@ -714,7 +716,7 @@ const Inventory = props => {
 				>
 					<AddIcon/>
 				</IconButton>
-			</div>
+			</div>*/}
 			{/*<SpeedDial
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}
@@ -738,7 +740,7 @@ const Inventory = props => {
     		dropDownItems={dropDownItems}
     		handleClose={() => setOpenTransaction( false )}
     	/>*/}
-    	<AddItemBox 
+    	{/*<AddItemBox 
     		// update={getItems}
       	// addItem={addItem}
       	defaultValues={items}
@@ -747,7 +749,7 @@ const Inventory = props => {
     		fullScreen={fullScreen} 
     		openAddBox={openAddBox} 
     		handleAddBox={handleAddBox}
-    	/>
+    	/>*/}
     	{/*<EditItemBox 
     		update={getItems}
     		editItem={updateItem}

@@ -23,6 +23,7 @@ const Signin = props => {
 		setToThisView
 	} = props.tools;
 
+	const passInp = React.useRef();
 	const [user, setUser] = React.useState({ username: '', password: '', showPassword: false });
 	const [signingIn, setSigningIn] = React.useState( false );
 	const [btnMsg, setBtnMsg] = React.useState('sign me in');
@@ -100,6 +101,16 @@ const Signin = props => {
 		}
 	}, [errMsg]);
 
+	const handleEnterKeyDown = e => {
+		if( e.key === 'Enter' ){
+			setSigningIn( true );
+		}
+	}
+
+	React.useEffect(() => {
+		passInp.current?.addEventListener('keydown', handleEnterKeyDown);
+	}, [passInp]);
+
 	return(
 		<div className="sign-in d-flex flex-column justify-content-center align-items-center">
 			{
@@ -135,6 +146,7 @@ const Signin = props => {
 				<FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
 					<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
 					<Input 
+						ref={passInp}
 						id="sign-in-pass" 
 						variant="standard" 
 						type={ user.showPassword ? "text" : "password" }
@@ -148,7 +160,7 @@ const Signin = props => {
 			                  onMouseDown={handleMouseDownPassword}
 			                  edge="end"
 			                >
-			                  { user.showPassword ? <VisibilityOff /> : <Visibility /> }
+			                  { user.showPassword ? <Visibility /> : <VisibilityOff /> }
 			                </IconButton>
 			              </InputAdornment>
 			            }

@@ -116,18 +116,22 @@ const Appbar = props => {
 	const path = window.location.pathname;
 	const [viewList, setViewList] = React.useState([{
 					title: 'Dashboard',
+					isActive: window.location.pathname === '/dashboard',
 					onClick: () => setToThisView('/dashboard')
 				},
 				{
 					title: 'Item List',
+					isActive: window.location.pathname === '/item-list',
 					onClick: () => setToThisView('/item-list')
 				},
 				{
 					title: 'Inventory',
+					isActive: window.location.pathname === '/inventory',
 					onClick: () => setToThisView('/inventory')
 				},
 				{
 					title: 'Reports',
+					isActive: window.location.pathname === '/reports',
 					onClick: () => setToThisView('/reports')
 				}
 		]);
@@ -135,7 +139,9 @@ const Appbar = props => {
 	const [barTitle, setBarTitle] = React.useState('Dashboard');
 	const [drawer, setDrawer] = React.useState( false );
 	const [anchorEl, setAnchorEl] = React.useState( null );
+	const [menuListIndex, setMenuListIndex] = React.useState( 0 );
 	const open = Boolean( anchorEl );
+
 
 	const [windowWidth, setWindowWidth] = React.useState( window.innerWidth );
 
@@ -207,29 +213,30 @@ const Appbar = props => {
     setDrawer( false );
   };
 
-	const list = () => (
+	const list = React.useCallback(() => (
 	    <Box
 	      sx={{ width: 240, padding: '10px 20px 20px 10px' }}
 	      role="presentation"
 	      onClick={toggleDrawer(false)}
 	      onKeyDown={toggleDrawer(false)}
 	    >
-			<List>
-				{viewList.map((item, index) => (
-					<ListItem 
-						key={uniqid()} 
-						button 
-						onClick={item.onClick}
-					>
-						<ListItemIcon>
-							<ArrowForwardIosIcon fontSize="small" />
-						</ListItemIcon>
-						<ListItemText primary={item.title} />
-					</ListItem>
-				))}
-			</List>
+				<List>
+					{viewList.map((item, index) => (
+						<ListItem 
+							key={uniqid()} 
+							button 
+							onClick={item.onClick}
+							sx={{ backgroundColor: item.isActive ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }}
+						>
+							<ListItemIcon>
+								<ArrowForwardIosIcon fontSize="small" />
+							</ListItemIcon>
+							<ListItemText primary={item.title} />
+						</ListItem>
+					))}
+				</List>
 	    </Box>
-	);
+	), [menuListIndex, viewList]);
 
 	React.useEffect(() => {
 		window.addEventListener('resize', resize);
@@ -238,9 +245,10 @@ const Appbar = props => {
 	}, []);
 
 	React.useEffect(() => {
-		if( role === 'admin' ){
+		if( role === 'admin' || role === 'sysadmin' ){
 			viewList.push({
 					title: 'Accounts',
+					isActive: window.location.pathname === '/accounts',
 					onClick: () => setToThisView('/accounts')
 				});
 		}

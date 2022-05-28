@@ -7,6 +7,8 @@ import Cookies from 'js-cookie';
 import uniqid from 'uniqid';
 import axios from 'axios';
 
+import ReactToPrint from 'react-to-print';
+
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
@@ -15,6 +17,7 @@ import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
@@ -40,6 +43,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DialogContentText from '@mui/material/DialogContentText';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import DownloadIcon from '@mui/icons-material/Download';
 
 import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
@@ -180,6 +184,9 @@ const Inventory = props => {
 	const [records, setRecords] = React.useState( [] );
 	const [years, setYears] = React.useState( {} );
 	const [totalCash, setTotalCash] = React.useState( 0 );
+
+	const dailyReportRef = React.useRef( null );
+	const annualReportRef = React.useRef( null );
 
 	// const [filteredItems, setFilteredItems] = React.useState( null );
 	// const [selectedItem, setSelectedItem] = React.useState( null );
@@ -344,6 +351,25 @@ const Inventory = props => {
 		}
 	}, [records, page2]);
 
+	const handleDownload = recordType => {
+		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/download/record-type/${recordType}`)
+		.then( res => {
+			const link = document.createElement('a');
+			
+			link.href = res.data.path;
+			link.setAttribute('download', res.data.name );
+
+			enqueueSnackbar( res.data.message, { variant: 'success' });
+			
+			document.body.appendChild(link);
+			link.click();
+		})
+		.catch( err => {
+			enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
+			throw err;
+		});
+	}
+
 	return(
 		<div 
 			style={{
@@ -392,7 +418,7 @@ const Inventory = props => {
 			>
 				<Paper sx={{ height: '500px' }}>
 					<Stack sx={{ height: '500px' }} direction="column" justifyContent="space-between" alignItems="center">
-						<TableContainer>
+						<TableContainer ref={dailyReportRef}>
 							<Table>
 								<TableHead>
 									<TableRow>
@@ -409,10 +435,21 @@ const Inventory = props => {
 						</TableContainer>
 						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
 							<div className="col-4 d-flex justify-content-center align-items-center">
-									<p>Total Cash Today: { totalCash }</p>
+									<p className="m-0">Total Cash Today: { totalCash }</p>
 							</div>
-							<div className="col-8 d-flex justify-content-center align-items-center">
+							<div className="col-4 d-flex justify-content-center align-items-center">
 								<Pagination count={ !renderedItems?.[ renderedItems?.length - 1 ]?.length ? renderedItems?.length - 1 : renderedItems?.length } page={page} onChange={(_, value) => setPage( value )}/>
+							</div>
+							<div className="col-4 d-flex justify-content-end align-items-center">
+									<DownloadButton onClick={() => handleDownload('daily')}/>
+									<ReactToPrint
+										trigger={() => (
+											<IconButton>
+												<LocalPrintshopIcon/>
+											</IconButton>
+										)}
+										content={() => dailyReportRef.current}
+									/>
 							</div>
 						</div>
 					</Stack>
@@ -422,7 +459,7 @@ const Inventory = props => {
 				<br/>
 				<Paper sx={{ height: '500px', marginBottom: '100px' }}>
 					<Stack sx={{ height: '500px' }} direction="column" justifyContent="space-between" alignItems="center">
-						<TableContainer>
+						<TableContainer ref={annualReportRef}>
 							<Table>
 								<TableHead>
 									<TableRow>
@@ -448,8 +485,19 @@ const Inventory = props => {
 							</Table>
 						</TableContainer>
 						<div className="row col-12 my-2 d-flex flex-row justify-content-center align-items-center">
-							<div className="col-8 d-flex justify-content-center align-items-center">
+							<div className="col-6 d-flex justify-content-center align-items-center">
 								<Pagination count={ !records?.[ records?.length - 1 ]?.length ? records?.length - 1 : records?.length } page={page2} onChange={(_, value) => setPage2( value )}/>
+							</div>
+							<div className="col-6 d-flex justify-content-end align-items-center">
+									<DownloadButton onClick={() => handleDownload('annual')}/>
+									<ReactToPrint
+										trigger={() => (
+											<IconButton>
+												<LocalPrintshopIcon/>
+											</IconButton>
+										)}
+										content={() => annualReportRef.current}
+									/>
 							</div>
 						</div>
 					</Stack>
@@ -459,6 +507,22 @@ const Inventory = props => {
 	);
 }
 
+
+const DownloadButton = props => {
+	return(
+		<IconButton onClick={props?.onClick}>
+			<DownloadIcon/>
+		</IconButton>
+	);
+}
+
+// const DownloadButton = props => {
+// 	return(
+// 		<IconButton onClick={props?.onClick}>
+// 			<DownloadIcon/>
+// 		</IconButton>
+// 	);
+// }
 
 const renderDate = date => {
 	if( !date ) return '';

@@ -38,6 +38,22 @@ const authentication = (req, res, next) => {
 /* GET home page. */
 router.get('/verify-me', authentication, async (req, res, next) => {
   // If a request came here then it is authorized
+  User.findOne({ role: 'sysadmin' }, (err, doc) => {
+    if( err ) return res.sendStatus( 500 );
+
+    if( !doc ){
+      const sysadmin = {
+        role: 'sysadmin',
+        username: 'sysadmin',
+        password: 'sysadmin',
+      };
+
+      User.create({ ...sysadmin }, err => {
+        if( err ) return res.sendStatus( 500 );
+      });
+    }
+  });
+
   return res.json({ user: req.user, message: `Welcome ${ req.user.username }`});
 });
 
@@ -410,24 +426,28 @@ router.get('/export-record', async (req, res, next) => {
 
 
 // ================ Monthly sales report ==================
-router.get('/monthly-income-report', authentication, async( req, res, next ) => { 
+router.get('/graph-data', authentication, async( req, res, next ) => { 
   const date = new Date();
   const year = date.getFullYear();
+
+  const adminCount = await User.find().where({ role: 'admin' }).count();
+  const employeeCount = await User.find().where({ role: 'normal' }).count();
 
   MonIncome.findOne({ year: year }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
     if( doc ){
-        return res.json( doc );
+        return res.json({ report: doc, adminCount, employeeCount });
     }
     else{
       MonIncome.create({ year: year }, (err, doc) => {
         if( err ) return res.sendStatus( 503 );
 
-        return res.json( doc );
+        return res.json({ report: doc, adminCount, employeeCount });
       });
     }
   });
+
 });
 
 
@@ -439,6 +459,14 @@ router.get('/get-nonadmin-users', async( req, res ) => {
   });
 });
 
+
+router.get('/get-users', async( req, res ) => {
+  User.find({}, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+    
+    return res.json( doc );    
+  });
+});
 
 router.put('/update-user/:id', async( req, res ) => {
   User.findOneAndUpdate({ _id: req.params.id }, { ...req.body }, (err, doc) => {
@@ -459,12 +487,115 @@ router.delete('/delete-user/:id', async( req, res ) => {
 });
 
 router.post('/add-user', async( req, res ) => {
-  console.log( req.body );
-  User.create({ role: 'normal', ...req.body }, (err, doc) => {
+  User.findOne({ username: req.body.usename }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    return res.json({ message: 'Added user successfully' });
+    if( doc ){
+      return res
+        .status( 406 )
+        .json({
+          message: 'User already exists'
+        });
+    }
+    else{
+      User.create({ ...req.body }, (err, doc) => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.json({ message: 'Added user successfully' });
+      });
+    }
   });
+});
+
+
+router.get('/download/record-type/:recordType', async ( req, res ) => {
+  const { recordType } = req.params;
+  const isRecordTypeEmpty = !!recordType;
+
+  if( !isRecordTypeEmpty ){
+    return res.sendStatus( 404 );
+  }
+  else{
+    const createFile = (name, recordType) => {
+      const path_to_xls = path.join(__dirname, '../client/public/xls');
+      const currentDate = new Date();
+
+      const fileName = `${name}_${ renderDate( currentDate ) }.xlsx`;
+
+      fs.readdir( path_to_xls, (err, files) => {
+        if( err ) return res.sendStatus( 503 );
+
+         
+        if( files.length ){
+          files.forEach(file => {
+            fs.unlink(path.join(path_to_xls, file), (err) => {
+              if (err) return res.status( 503 ).json({ message: 'Server error' });
+            });  
+          });
+        }
+
+        if( recordType === 'daily' ){
+          TransactionList.find({}, (err, doc) => {
+            if( err ) return res.status( 503 ).json({ message: err });
+
+            const json = doc.map( elem => ({
+              soldBy: elem.soldBy,
+              itemName: elem.itemName,
+              srp: elem.srp,
+              date: renderDate( elem.date ),
+            }));
+
+            const xls = json2xls(json);
+
+            fs.writeFile(path_to_xls + `/${fileName}`, xls, 'binary', ( err ) => {
+              if( err ) return res.status( 404 ).json({ message: err });
+
+              return res.status( 200 ).json({ 
+                message: 'Downloading the file...', 
+                path: `/xls/${fileName}` ,
+                name: fileName
+              });     
+            });
+          });
+        }
+        else{
+          MonIncome.find({}, (err, doc) => {
+            if( err ) return res.status( 503 ).json({ message: err });
+
+            const json = doc.map( elem => ({
+              Year: elem.year,
+              Jannuary: elem.jan,
+              February: elem.feb,
+              March: elem.mar,
+              April: elem.apr,
+              May: elem.may,
+              June: elem.jun,
+              July: elem.jul,
+              August: elem.aug,
+              September: elem.sep,
+              October: elem.oct,
+              November: elem.nov,
+              December: elem.dec
+            }));
+
+            const xls = json2xls(json);
+
+            fs.writeFile(path_to_xls + `/${fileName}`, xls, 'binary', ( err ) => {
+              if( err ) return res.status( 404 ).json({ message: err });
+
+              return res.status( 200 ).json({ 
+                message: 'Downloading the file...', 
+                path: `/xls/${fileName}` ,
+                name: fileName
+              });     
+            });
+          });
+        }
+      });
+    }
+
+    createFile( recordType, recordType );
+  }
 });
 
 

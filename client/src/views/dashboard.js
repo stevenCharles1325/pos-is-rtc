@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { Bar } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
 
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
@@ -14,12 +14,15 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
+import Divider from '@mui/material/Divider';
 import dashBoardPhoto from '../images/pic1.jpg';
 
 const Dashboard = props => {
-	const { errorHandler, name, setToThisView } = props.tools;
+	const { errorHandler, name, setToThisView, role } = props.tools;
 
 	const [monthlyIncome, setMonthlyIncome] = React.useState( null );
+	const [adminCount, setAdminCount] = React.useState( 0 );
+	const [employeeCount, setEmployeeCount] = React.useState( 0 );
 
 	const scales = {
 	    yAxes: [
@@ -62,16 +65,22 @@ const Dashboard = props => {
 
 
 	React.useEffect(() => {
+
+	}, []);
+
+	React.useEffect(() => {
 		const getGrapData = async () => {
 			const token = Cookies.get('token');
 
-			axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/monthly-income-report`, {
+			axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/graph-data`, {
 				headers: {
 					'authentication': `Bearer ${ token }`
 				}
 			})
 			.then( res => {
-				setMonthlyIncome( res.data );
+				setMonthlyIncome( res.data.report );
+				setAdminCount( res.data.adminCount );
+				setEmployeeCount( res.data.employeeCount );
 			})
 			.catch( err => {
 				errorHandler.handle( err, getGrapData, 9 );
@@ -112,8 +121,30 @@ const Dashboard = props => {
 							: <Skeleton animation="wave" variant="rectangular" width="100%" height="450px"/>
 					}
 			</div>
-
-			<div className="m-0 p-2 col-md-4">
+			{
+				props?.tools?.role === 'sysadmin' && monthlyIncome
+					? 	<div className="col-md-4 ml-0 p-1 my-3">
+							<Paper elevation={10} sx={{ width: '100%', height: '100%', padding: '10px' }}>
+								<Pie
+									data={{
+										labels: ['Administrator', 'Employee'],
+								        datasets: [
+								            {
+								                label: `User count`,
+								                data: [adminCount, employeeCount],
+								                fill: false,
+								                backgroundColor: ['rgb(100, 100, 100)', 'rgb(196, 196, 196)'],
+								                borderColor: 'rgba(255, 255, 255, 0.5)'
+								            }
+								        ]
+									}}
+									{...options}
+								/>
+							</Paper>
+						</div>
+					: null
+			}
+			{/*<div className="m-0 p-2 col-md-4">
 				<Card sx={{ maxWidth: 500, height: 400 }}>
 			      {
 			      	monthlyIncome && dashBoardPhoto
@@ -161,7 +192,7 @@ const Dashboard = props => {
 			      	}
 			      </CardActions>
 			    </Card>
-			</div>
+			</div>*/}
 		</div>
 	);
 }

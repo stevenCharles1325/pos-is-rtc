@@ -151,6 +151,7 @@ const Item = props => {
 						});
 						handleEditBox();
 					}}
+					disabled={props?.role !== 'admin'}
 				>
 					<EditIcon/>
 				</IconButton>
@@ -365,6 +366,7 @@ const Inventory = props => {
 					buy={buyItem}
 					key={uniqid()}
 					update={getItems}
+					role={props?.tools?.role}
 					handleUpdate={ updateItem }
 					handleDelete={ deleteItem }
 					handleEditBox={ handleEditBox }
@@ -397,7 +399,7 @@ const Inventory = props => {
 
 	// const memoizedFiltering = React.useCallback(() => handleSearching(), [search, items]);
 
-	React.useEffect(() => handleSearching(), [search, items]);
+	React.useEffect(() => handleSearching(), [search, items, props]);
 	React.useEffect(() => getItems(), []);
 
 	React.useEffect(() => {
@@ -489,8 +491,8 @@ const Inventory = props => {
 									</div>
 								)
 				}*/}
-				<Paper sx={{ height: '500px' }}>
-					<Stack sx={{ height: '500px' }} direction="column" justifyContent="space-between" alignItems="center">
+				<Paper sx={{ height: '450px' }}>
+					<Stack sx={{ height: '450px' }} direction="column" justifyContent="space-between" alignItems="center">
 						<TableContainer>
 							<Table>
 								<TableHead>
@@ -524,6 +526,7 @@ const Inventory = props => {
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}
         icon={<SpeedDialIcon />}
+        hidden={props?.tools?.role !== 'admin'}
 	     >
 	        {
 	        	actions.map((action, index) => (
@@ -562,7 +565,12 @@ const AddItemBox = props => {
 		handleAddBox,
 	} = props;
 
-	let today = new Date().toISOString().split('T')[0];
+	let currDate = new Date();
+	const date = String(currDate.getDate()).padStart(2, '0');
+	const month = String(currDate.getMonth() + 1).padStart(2, '0');
+	const year = currDate.getFullYear();
+	const today = `${year}-${month}-${date}`;
+
 	const { enqueueSnackbar } = useSnackbar();
 
 	const [item, setItem] = React.useState({
@@ -888,7 +896,7 @@ const renderDate = date => {
 	if( !date ) return '';
 
 	const _parsedDate = new Date( date );
-	const _date = _parsedDate.getDate();
+	const _date = (_parsedDate.getDate()).toString().padStart(2, '0');
 	const _month = (_parsedDate.getMonth() + 1).toString().padStart( 2, '0' );
 	const _year = _parsedDate.getFullYear();
 

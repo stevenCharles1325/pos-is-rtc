@@ -114,12 +114,14 @@ const Accounts = props => {
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+	const role = React.useMemo(() => props?.tools?.role, [props]);
+
 	const handleItemBox = () => {
 		setOpenItemBox( openItemBox => !openItemBox );
 	}
 
 	const handleFetchNonAdminAccounts = async () => {
-		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/get-nonadmin-users`)
+		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/get-users`)
 		.then( res => {
 			setAccounts([ ...res.data ]);
 		})
@@ -203,7 +205,7 @@ const Accounts = props => {
 	const handleAccountsRendering = () => {
 		const accountList = [];
 
-		accounts.forEach( acc => {
+		const addAccount = acc => {
 			accountList.push(
 				<Item
 					{ ...acc }
@@ -216,6 +218,15 @@ const Accounts = props => {
 					update={handleFetchNonAdminAccounts}
 				/>
 			);
+		}
+
+		accounts.forEach( acc => {
+			if( props?.tools?.role === 'sysadmin' && acc.role === 'admin' ){
+				addAccount( acc );
+			}
+			else if( props?.tools?.role === 'admin' && acc.role === 'normal'){
+				addAccount( acc );
+			}
 		});
 
 		setRenderedAccounts([ ...accountList ]);
@@ -228,13 +239,12 @@ const Accounts = props => {
 	}, [openItemBox]);
 	
 	React.useEffect(() => handleFetchNonAdminAccounts(), []);
-	React.useEffect(() => handleAccountsRendering(), [accounts]);
+	React.useEffect(() => handleAccountsRendering(), [accounts, props]);
 
 	React.useEffect(() => {
-		if( props.tools.role !== 'admin' ){
+		if( props.tools.role !== 'admin' || props.tools.role !== 'sysadmin' ){
 			props?.setToThisView?.('/dashboard');
 		}
-
 	}, [props.tools.role]);
 
 	return(
@@ -265,6 +275,7 @@ const Accounts = props => {
 			    		handleItemBox={handleItemBox}
 			    		setSelectedItem={setSelectedItem}
 			    		update={handleFetchNonAdminAccounts}
+			    		role={role === 'sysadmin' ? 'admin' : 'normal'}
 			    	/>  
 			    	: null
 			}
@@ -300,6 +311,7 @@ const ItemBox = props => {
 		middleName: selectedItem?.middleName ?? '',
 		email: selectedItem?.email ?? '',
 		number: selectedItem?.number ?? '',
+		role: props?.role ?? '',
 	}
 
 	const handleClickShowPassword = () => {
@@ -353,6 +365,10 @@ const ItemBox = props => {
 				state.number = action.data;
 				return state;
 
+			case 'role':
+				state.role = action.data;
+				return state;
+
 			default:
 				return state;			
 		}
@@ -383,11 +399,12 @@ const ItemBox = props => {
 	}
 
 	const areAllFieldsFilled = ( doShift = false ) => {
+		console.log( item );
 		const itemVal = Object.values( item );
 
 		if( doShift ) itemVal.shift();
 		for( let val of itemVal ){
-			if( !val.length ) return false;
+			if( !val?.length ) return false;
 		}
 
 		return true;
@@ -412,6 +429,7 @@ const ItemBox = props => {
 			dispatch({ type: 'lastName', data: data.lastName });
 			dispatch({ type: 'email', data: data.email });
 			dispatch({ type: 'number', data: data.number });
+			dispatch({ type: 'role', data: props.role });
 		}
 		else{
 			dispatch({ type: 'username', data: '' });
@@ -421,6 +439,7 @@ const ItemBox = props => {
 			dispatch({ type: 'lastName', data: '' });
 			dispatch({ type: 'email', data: '' });
 			dispatch({ type: 'number', data: '' });
+			dispatch({ type: 'role', data: props?.role });
 		}
 
 	}, [props]);
@@ -569,7 +588,8 @@ const ItemBox = props => {
 				          			middleName,
 				          			lastName,
 				          			email,
-				          			number 
+				          			number,
+				          			role 
 				          		} = item;
 
 				          		handleItemBox();
@@ -580,7 +600,8 @@ const ItemBox = props => {
 				          			middleName,
 				          			lastName,
 				          			email,
-				          			number
+				          			number,
+				          			role
 				          		});
 				          	}} 
 				          	autoFocus
