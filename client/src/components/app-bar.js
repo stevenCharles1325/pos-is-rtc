@@ -34,6 +34,12 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 
 
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
+import GroupIcon from '@mui/icons-material/Group';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
     backgroundColor: '#44b700',
@@ -116,21 +122,25 @@ const Appbar = props => {
 	const path = window.location.pathname;
 	const [viewList, setViewList] = React.useState([{
 					title: 'Dashboard',
+					icon: <DashboardIcon/>,
 					isActive: window.location.pathname === '/dashboard',
 					onClick: () => setToThisView('/dashboard')
 				},
 				{
 					title: 'Item List',
+					icon: <InventoryIcon/>,
 					isActive: window.location.pathname === '/item-list',
 					onClick: () => setToThisView('/item-list')
 				},
 				{
 					title: 'Inventory',
+					icon: <FeaturedPlayListIcon/>,
 					isActive: window.location.pathname === '/inventory',
 					onClick: () => setToThisView('/inventory')
 				},
 				{
 					title: 'Reports',
+					icon: <GroupIcon/>,
 					isActive: window.location.pathname === '/reports',
 					onClick: () => setToThisView('/reports')
 				}
@@ -229,9 +239,9 @@ const Appbar = props => {
 							sx={{ backgroundColor: item.isActive ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }}
 						>
 							<ListItemIcon>
-								<ArrowForwardIosIcon fontSize="small" />
+								{ item.icon }
 							</ListItemIcon>
-							<ListItemText primary={item.title} />
+							<ListItemText primary={item.title}/>
 						</ListItem>
 					))}
 				</List>
@@ -248,6 +258,7 @@ const Appbar = props => {
 		if( role === 'admin' || role === 'sysadmin' ){
 			viewList.push({
 					title: 'Accounts',
+					icon: <AssessmentIcon/>,
 					isActive: window.location.pathname === '/accounts',
 					onClick: () => setToThisView('/accounts')
 				});
@@ -417,10 +428,10 @@ const Appbar = props => {
 					>
 						<StyledBadge
 							overlap="circular"
-					        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-					        variant="dot"
+			        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+			        variant="dot"
 						>	
-							<Tooltip title={ name } placement="left">
+							<Tooltip title={`Welcome ${name}!`} placement="left">
 								<Avatar
 									sx={{ bgcolor: 'rgba(200, 200, 200, 1)', color: 'black'}}
 									onClick={ handleClickBadge }

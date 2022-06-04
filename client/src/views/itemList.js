@@ -151,7 +151,7 @@ const Item = props => {
 						});
 						handleEditBox();
 					}}
-					disabled={props?.role !== 'admin'}
+					disabled={props?.role !== 'normal'}
 				>
 					<EditIcon/>
 				</IconButton>
