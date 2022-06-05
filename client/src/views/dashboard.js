@@ -125,7 +125,7 @@ const Dashboard = props => {
 				props?.tools?.role === 'sysadmin' && monthlyIncome
 					? 	<div className="col-md-4 ml-0 p-1 my-3">
 							<Paper elevation={10} sx={{ width: '100%', height: '100%', padding: '10px' }}>
-								<Pie
+								<Bar
 									data={{
 										labels: ['Administrator', 'Employee'],
 								        datasets: [
