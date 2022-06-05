@@ -599,6 +599,35 @@ router.get('/download/record-type/:recordType', async ( req, res ) => {
 });
 
 
+router.put('/change-password/user/:name', authentication, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const { name } = req.params;
+
+
+  User.findOne({ username: name }, ( err, user ) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( user ){
+      if( user.password === currentPassword ){
+        user.password = newPassword;
+
+        user.save( err => {
+          if( err ) return res.sendStatus( 503 );
+
+          return res.sendStatus( 200 );
+        });
+      }
+      else{
+        return res.sendStatus( 403 );
+      }
+    }
+    else{
+      return res.sendStatus( 404 );
+    }
+  }); 
+});
+
+
 const renderDate = date => {
   if( !date ) return '';
 

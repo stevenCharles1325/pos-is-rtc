@@ -14,6 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 
+const ChangePassword = React.lazy(() => import('./views/ChangePassword'));
 const Transactions = React.lazy(() => import('./views/transaction'));
 const Dashboard = React.lazy(() => import('./views/dashboard'));
 const Inventory = React.lazy(() => import('./views/inventory'));
@@ -111,6 +112,10 @@ function App() {
           setToThisView( path.pathname );
           break;
 
+        case '/change-password':
+          setToThisView( path.pathname );
+          break;
+
         case '/reports':
           setToThisView( path.pathname );
           break;
@@ -168,6 +173,11 @@ function App() {
                       <Route exact path="/item-list">
                         <Appbar tools={tools}/>
                         <ItemList tools={tools}/>
+                      </Route>
+
+                      <Route exact path="/change-password">
+                        <Appbar tools={tools}/>
+                        <ChangePassword tools={tools}/>
                       </Route>
 
                       <Route exact path="/reports">

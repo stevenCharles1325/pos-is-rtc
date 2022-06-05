@@ -39,6 +39,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
 import GroupIcon from '@mui/icons-material/Group';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import PasswordIcon from '@mui/icons-material/Password';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -139,8 +140,14 @@ const Appbar = props => {
 					onClick: () => setToThisView('/inventory')
 				},
 				{
+					title: 'Change Password',
+					icon: <PasswordIcon/>,
+					isActive: window.location.pathname === '/change-password',
+					onClick: () => setToThisView('/change-password')
+				},
+				{
 					title: 'Reports',
-					icon: <GroupIcon/>,
+					icon: <AssessmentIcon/>,
 					isActive: window.location.pathname === '/reports',
 					onClick: () => setToThisView('/reports')
 				}
@@ -173,6 +180,9 @@ const Appbar = props => {
 
 			case '/item-list':
 				return 'Item List';
+
+			case '/change-password':
+				return 'Change password';
 
 			case '/accounts':
 				return 'Accounts';
@@ -258,7 +268,7 @@ const Appbar = props => {
 		if( role === 'admin' || role === 'sysadmin' ){
 			viewList.push({
 					title: 'Accounts',
-					icon: <AssessmentIcon/>,
+					icon: <GroupIcon/>,
 					isActive: window.location.pathname === '/accounts',
 					onClick: () => setToThisView('/accounts')
 				});
