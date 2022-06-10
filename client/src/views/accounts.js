@@ -527,7 +527,7 @@ const ItemBox = props => {
 			                  onMouseDown={handleMouseDownPassword}
 			                  edge="end"
 			                >
-			                  { showPassword ? <VisibilityOff /> : <Visibility /> }
+			                  { !showPassword ? <VisibilityOff /> : <Visibility /> }
 			                </IconButton>
 			              </InputAdornment>
 			            }

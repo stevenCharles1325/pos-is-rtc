@@ -16,6 +16,10 @@ import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import dashBoardPhoto from '../images/pic1.jpg';
+import PosCard from './Card';
+
+import GroupIcon from '@mui/icons-material/Group';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
 const Dashboard = props => {
 	const { errorHandler, name, setToThisView, role } = props.tools;
@@ -23,6 +27,7 @@ const Dashboard = props => {
 	const [monthlyIncome, setMonthlyIncome] = React.useState( null );
 	const [adminCount, setAdminCount] = React.useState( 0 );
 	const [employeeCount, setEmployeeCount] = React.useState( 0 );
+	const [items, setItems] = React.useState( 0 );
 
 	const scales = {
 	    yAxes: [
@@ -64,9 +69,26 @@ const Dashboard = props => {
 	});
 
 
-	React.useEffect(() => {
+	const getItems = async () => {
+		const token = Cookies.get('token');
 
-	}, []);
+		axios.get(`http://${process.env.REACT_APP_ADDRESS}:${process.env.REACT_APP_PORT}/shop-items`, {
+			headers: {
+				'authentication': `Bearer ${ token }`
+			}
+		})
+		.then( res => {
+			setItems( res.data.items.length );
+
+			// if (res.data.items.length)
+			// 	enqueueSnackbar( res.data.message, { variant: 'success' });
+		})
+		.catch( err => {
+			errorHandler.handle( err, getItems, 3 );
+		});
+	}
+
+
 
 	React.useEffect(() => {
 		const getGrapData = async () => {
@@ -88,6 +110,7 @@ const Dashboard = props => {
 		}
 
 		getGrapData();
+		getItems();
 	}, []);
 
 
@@ -104,7 +127,7 @@ const Dashboard = props => {
 			}}
 			className="row d-flex justify-content-around align-items-center"
 		>	
-			<div className="ml-0 p-1 col-md-7" style={{height: 'fit-content'}}>
+			<div className="ml-0 p-1 col-md-7 d-flex justify-content-center align-items-center" style={{ height: 'fit-content' }}>
 					{ 
 						monthlyIncome
 							? (
@@ -121,29 +144,64 @@ const Dashboard = props => {
 							: <Skeleton animation="wave" variant="rectangular" width="100%" height="450px"/>
 					}
 			</div>
-			{
-				props?.tools?.role === 'sysadmin' && monthlyIncome
-					? 	<div className="col-md-4 ml-0 p-1 my-3">
-							<Paper elevation={10} sx={{ width: '100%', height: '100%', padding: '10px' }}>
-								<Bar
-									data={{
-										labels: ['Administrator', 'Employee'],
-								        datasets: [
-								            {
-								                label: `User count`,
-								                data: [adminCount, employeeCount],
-								                fill: false,
-								                backgroundColor: ['rgb(100, 100, 100)', 'rgb(196, 196, 196)'],
-								                borderColor: 'rgba(255, 255, 255, 0.5)'
-								            }
-								        ]
-									}}
-									{...options}
-								/>
-							</Paper>
-						</div>
-					: null
-			}
+			<div className="col-md-3 ml-0 d-flex flex-column align-items-center">
+					
+					{
+						props?.tools?.role === 'sysadmin'
+							?	<>
+									<PosCard
+										icon={GroupIcon}
+										title="Number of Administrator"
+										data={{
+											count: adminCount,
+											countLabel: 'Administrators'
+										}}
+									/>
+									<br/>
+								</>
+							: 	null
+					}
+					{
+						props?.tools?.role !== 'normal'
+							?	<>
+									<PosCard
+										icon={GroupIcon}
+										title="Number of Employees"
+										data={{
+											count: employeeCount,
+											countLabel: 'Employees'
+										}}
+									/>
+									<br/>
+								</>
+							: 	null
+					}
+					<PosCard
+						icon={PhoneAndroidIcon}
+						title="Number of Items"
+						data={{
+							count: items,
+							countLabel: 'Items'
+						}}
+					/>
+			</div>
+			{/*<Paper elevation={10} sx={{ width: '100%', height: '100%', padding: '10px' }}>
+				<Bar
+					data={{
+						labels: ['Administrator', 'Employee'],
+				        datasets: [
+				            {
+				                label: `User count`,
+				                data: [adminCount, employeeCount],
+				                fill: false,
+				                backgroundColor: ['rgb(100, 100, 100)', 'rgb(196, 196, 196)'],
+				                borderColor: 'rgba(255, 255, 255, 0.5)'
+				            }
+				        ]
+					}}
+					{...options}
+				/>
+			</Paper>*/}
 			{/*<div className="m-0 p-2 col-md-4">
 				<Card sx={{ maxWidth: 500, height: 400 }}>
 			      {
