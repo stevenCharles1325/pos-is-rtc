@@ -307,11 +307,24 @@ const Appbar = props => {
 					>
 						<MenuIcon sx={{ color:"black" }} />
 					</IconButton>
-					{
-		      	windowWidth > 700
-		      		? <img width="200px" src="/images/unnamed.png" className="pt-3"/>
-		      		: null
-		      }
+					<div 
+						style={{
+							width: 'fit-content',
+							height: '45px'
+						}}
+		      	className="d-flex justify-content-end"
+		      >
+			      <h5 
+			      	className="p-2 m-0 px-3" 
+			      	style={{ 
+			      		border: '1px solid rgba(0, 0, 0, 0.5)',
+			      		width: 'fit-content',
+			      		color: 'rgba(0, 0, 0, 0.8)'
+			      	}}
+			      > 
+			      		{ handleTitle() } 
+			      	</h5>
+		      </div>
 				</div>
 				<Drawer
           anchor="left"
@@ -347,24 +360,12 @@ const Appbar = props => {
 					}}
 					className="col-3 d-flex justify-content-between align-items-center"
 				>
-					<div 
-						style={{
-							width: 'fit-content',
-							height: '45px'
-						}}
-		      	className="d-flex justify-content-end"
-		      >
-			      <h5 
-			      	className="p-2 m-0 px-3" 
-			      	style={{ 
-			      		border: '1px solid rgba(0, 0, 0, 0.5)',
-			      		width: 'fit-content',
-			      		color: 'rgba(0, 0, 0, 0.8)'
-			      	}}
-			      > 
-			      		{ handleTitle() } 
-			      	</h5>
-		      </div>
+					
+		      {
+		      	windowWidth > 700
+		      		? <img width="200px" src="/images/unnamed.png" className="pt-3"/>
+		      		: null
+		      }
 					<IconButton
 						size="large"
 						color="inherit"

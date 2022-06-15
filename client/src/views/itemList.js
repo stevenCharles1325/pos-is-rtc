@@ -412,7 +412,6 @@ const Inventory = props => {
 		}
 	}, [renderedItems, page]);
 
-
 	return(
 		<div 
 			style={{
@@ -526,7 +525,7 @@ const Inventory = props => {
         ariaLabel="speed dial"
         sx={{ position: 'absolute', bottom: 16, right: 30 }}
         icon={<SpeedDialIcon />}
-        hidden={props?.tools?.role !== 'admin'}
+        hidden={props?.tools?.role !== 'normal'}
 	     >
 	        {
 	        	actions.map((action, index) => (
