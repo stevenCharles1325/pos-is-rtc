@@ -832,7 +832,6 @@ const EditItemBox = props => {
 		          />
 		          
 		          <TextField 
-			          disabled
 		          	onChange={handleCount} 
 		          	value={item?.quantity} 
 		          	autoFocus 
