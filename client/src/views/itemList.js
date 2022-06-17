@@ -433,7 +433,7 @@ const Inventory = props => {
 							}}
 							className="py-4"
 						>
-							<Search>
+							<Search className="border-black">
 		            <SearchIconWrapper>
 		              <SearchIcon />
 		            </SearchIconWrapper>

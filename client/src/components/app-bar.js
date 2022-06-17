@@ -139,12 +139,12 @@ const Appbar = props => {
 					isActive: window.location.pathname === '/inventory',
 					onClick: () => setToThisView('/inventory')
 				},
-				{
-					title: 'Change Password',
-					icon: <PasswordIcon/>,
-					isActive: window.location.pathname === '/change-password',
-					onClick: () => setToThisView('/change-password')
-				},
+				// {
+				// 	title: 'Change Password',
+				// 	icon: <PasswordIcon/>,
+				// 	isActive: window.location.pathname === '/change-password',
+				// 	onClick: () => setToThisView('/change-password')
+				// },
 				{
 					title: 'Reports',
 					icon: <AssessmentIcon/>,
@@ -338,7 +338,7 @@ const Appbar = props => {
 					windowWidth > 620 && (window.location.pathname.includes('inventory') || window.location.pathname.includes('item-list'))
 						? (
 					      <div className="col-4">
-									<Search>
+									<Search className="border-black">
 					          <SearchIconWrapper>
 					            <SearchIcon sx={{ color: 'black' }}/>
 					          </SearchIconWrapper>
@@ -390,6 +390,7 @@ const Appbar = props => {
 								anchorEl={ anchorEl }
 								onClose={ handleClose }
 							>
+								<MenuItem onClick={() => setToThisView('/change-password')}>Change-password</MenuItem>
 								<MenuItem onClick={handleSignOut}>Sign-out</MenuItem>
 							</Menu>
 						</StyledBadge>
